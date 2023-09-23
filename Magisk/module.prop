@@ -2,6 +2,5 @@ id=mujderel
 name=MujdeRel
 version=v1
 versionCode=1
-author=ArielTubul
+author=Ariel Tubul
 description=A Magisk module to inject Frida scripts
-template=3
