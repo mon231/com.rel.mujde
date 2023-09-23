@@ -1,4 +1,5 @@
-FROM 3.12.0rc3-alpine3.18
+FROM ubuntu:latest
 
-RUN pip install ipython frida-tools
-RUN apt install -y cmake ninja-build clang android-ndk-r21d
+RUN apt update && apt upgrade -y
+RUN apt install -y cmake ninja-build clang python3
+RUN wget https://dl.google.com/android/repository/android-ndk-r26-linux.zip -o ndk.zip
