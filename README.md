@@ -8,19 +8,17 @@ Simply download [latest-release](https://github.com/mon231/mujde/releases/latest
 Place the downloaded zip in your phone, then use `Magisk->Modules->Install from storage`, provide the chosen path, and wait a few seconds for installation-success message!
 
 ### Injections
-The module follows a folder tree (path will be provided later), where each targeted package will have it's own folder, containing list of scripts to inject whenever the processes starts! <br />
+The module follows a folder tree (at `/data/data/rel.mujde`), where each targeted package will have it's own folder, containing list of scripts to inject whenever the processes starts! <br />
 All you have to do is to create a folder, named after the package you want to inject the scripts into, then upload your scripts into that folder! <br />
 ```
-- com.example
-| - first_script.js
-| - example_file.js
+- /data/data/rel.mujde
+  - com.example
+  | - first_script.js
+  | - example_file.js
 
-- com.yourapp
-| - myscript.js
+  - com.yourapp
+  | - myscript.js
 ```
-
-Unfortunately, the module does not implement any watchdog-logic to watch for newly uploaded scripts at the moment, <br />
-So you'll have to reboot your device to initiate the pending changes
 
 ### Notes
 It's highly recommended (and sometimes even required) to reboot your device after modules installation <br />
