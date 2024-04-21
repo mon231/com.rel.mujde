@@ -222,20 +222,6 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
         }
 
         /**
-         * See [Utils.forceStopPackage].
-         */
-        forceStopGooglePhotos.setOnClickListener {
-            utils.forceStopPackage(Constants.PACKAGE_NAME_GOOGLE_PHOTOS, this)
-        }
-
-        /**
-         * See [Utils.openApplication].
-         */
-        openGooglePhotos.setOnClickListener {
-            utils.openApplication(Constants.PACKAGE_NAME_GOOGLE_PHOTOS, this)
-        }
-
-        /**
          * Launch [FeatureCustomize] to fine select the features.
          */
         customizeFeatureFlags.setOnClickListener {

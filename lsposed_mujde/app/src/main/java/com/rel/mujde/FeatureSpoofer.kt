@@ -1,7 +1,6 @@
 package com.rel.mujde
 
 import android.util.Log
-import com.rel.mujde.Constants.PACKAGE_NAME_GOOGLE_PHOTOS
 import com.rel.mujde.Constants.PREF_ENABLE_VERBOSE_LOGS
 import com.rel.mujde.Constants.PREF_OVERRIDE_ROM_FEATURE_LEVELS
 import com.rel.mujde.Constants.PREF_SPOOF_FEATURES_LIST
@@ -150,8 +149,12 @@ class FeatureSpoofer: IXposedHookLoadPackage {
          * If user selects to never use this on any other app other than Google photos,
          * then check package name and return if necessary.
          */
+
+        /* TODO: stuff
         if (pref.getBoolean(PREF_STRICTLY_CHECK_GOOGLE_PHOTOS, true) &&
             lpparam?.packageName != PACKAGE_NAME_GOOGLE_PHOTOS) return
+
+         */
 
         log("Loaded FeatureSpoofer for ${lpparam?.packageName}")
 

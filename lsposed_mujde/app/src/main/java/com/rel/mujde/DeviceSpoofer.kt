@@ -2,7 +2,6 @@ package com.rel.mujde
 
 import android.os.Build
 import android.util.Log
-import com.rel.mujde.Constants.PACKAGE_NAME_GOOGLE_PHOTOS
 import com.rel.mujde.Constants.PREF_DEVICE_TO_SPOOF
 import com.rel.mujde.Constants.PREF_ENABLE_VERBOSE_LOGS
 import com.rel.mujde.Constants.PREF_SPOOF_ANDROID_VERSION_FOLLOW_DEVICE
@@ -78,8 +77,11 @@ class DeviceSpoofer: IXposedHookLoadPackage {
          * If user selects to never use this on any other app other than Google photos,
          * then check package name and return if necessary.
          */
+        /* TODO: sufff
         if (pref.getBoolean(PREF_STRICTLY_CHECK_GOOGLE_PHOTOS, true) &&
             lpparam?.packageName != PACKAGE_NAME_GOOGLE_PHOTOS) return
+
+         */
 
         log("Loaded DeviceSpoofer for ${lpparam?.packageName}")
         log("Device spoof: ${finalDeviceToSpoof?.deviceName}")
