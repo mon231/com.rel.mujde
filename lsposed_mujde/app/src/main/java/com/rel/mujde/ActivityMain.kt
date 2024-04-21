@@ -29,7 +29,6 @@ import com.rel.mujde.Constants.PREF_STRICTLY_CHECK_GOOGLE_PHOTOS
 import com.rel.mujde.Constants.RELEASES_URL
 import com.rel.mujde.Constants.RELEASES_URL2
 import com.rel.mujde.Constants.SHARED_PREF_FILE_NAME
-import com.rel.mujde.Constants.TELEGRAM_GROUP
 import com.rel.mujde.Constants.UPDATE_INFO_URL
 import com.rel.mujde.Constants.UPDATE_INFO_URL2
 import com.google.android.material.snackbar.Snackbar
@@ -127,7 +126,6 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
         val forceStopGooglePhotos = findViewById<Button>(R.id.force_stop_google_photos)
         val openGooglePhotos = findViewById<ImageButton>(R.id.open_google_photos)
         val advancedOptions = findViewById<TextView>(R.id.advanced_options)
-        val telegramLink = findViewById<TextView>(R.id.telegram_group)
         val updateAvailableLink = findViewById<TextView>(R.id.update_available_link)
         val confExport = findViewById<ImageButton>(R.id.conf_export)
         val confImport = findViewById<ImageButton>(R.id.conf_import)
@@ -242,16 +240,6 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
          */
         customizeFeatureFlags.setOnClickListener {
             childActivityLauncher.launch(Intent(this, FeatureCustomize::class.java))
-        }
-
-        /**
-         * Open telegram group.
-         */
-        telegramLink.apply {
-            paintFlags = Paint.UNDERLINE_TEXT_FLAG
-            setOnClickListener {
-                openWebLink(TELEGRAM_GROUP)
-            }
         }
 
         /**
