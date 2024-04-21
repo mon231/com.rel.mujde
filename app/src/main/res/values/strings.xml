@@ -28,7 +28,7 @@
     <string name="force_stop_google_photos">Force stop\nGoogle Photos</string>
     <string name="module_not_enabled">
         \n
-        Looks like mujde's module is not yet enabled.\n
+        Looks like mujde\'s module is not yet enabled.\n
         Please enable it in LSPosed / EdXposed, then reboot the device.
     </string>
     <string name="close">Close</string>
