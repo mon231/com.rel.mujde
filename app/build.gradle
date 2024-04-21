@@ -28,6 +28,9 @@ android {
         jvmTarget = '1.8'
     }
     namespace 'com.rel.mujde'
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {
