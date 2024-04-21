@@ -10,6 +10,11 @@
 ## How does it work?
 NOT IMPLEMENTED YET..
 
+### Planning
+We'll have a main activity that provide the list of intercepted application. <br />
+Each intercepted application will have it's own folder with it's own list of frida-scripts, <br />
+And it's own frida-config file, with a unique symlink to instance of frida-gadget native on the disk.
+
 ## Notes and references
 1. [Xposed API](https://api.xposed.info/)
 1. [Frida API](https://frida.re/docs/javascript-api/)
