@@ -1,9 +1,0 @@
-FROM arm64v8/ubuntu
-RUN apt update && apt upgrade -y
-RUN apt install clang git -y
-
-# NOTE: maybe set dockerfile env CC="clang -pie -fPIE"
-RUN CC="clang -pie -fPIE" apt install python3 python3-pip python3-ipython -y
-RUN git clone https://github.com/pyinstaller/pyinstaller.git
-RUN CC="clang -pie -fPIE" pip install ./pyinstaller
-RUN rm -rf pyinstaller
