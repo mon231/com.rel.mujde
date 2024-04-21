@@ -1,8 +1,8 @@
 package com.rel.mujde
 
 object Constants {
-    val UPDATE_INFO_URL = "https://raw.githubusercontent.com/mon231/mujde/main/lsposed_mujde/update_info.json"
-    val UPDATE_INFO_URL2 = "https://raw.githubusercontent.com/Xposed-Modules-Repo/com.rel.mujde/main/lsposed_mujde/update_info.json"
+    val UPDATE_INFO_URL = "https://raw.githubusercontent.com/mon231/mujde/main/update_info.json"
+    val UPDATE_INFO_URL2 = "https://raw.githubusercontent.com/Xposed-Modules-Repo/com.rel.mujde/main/update_info.json"
 
     val RELEASES_URL = "https://github.com/mon231/mujde/releases"
     val RELEASES_URL2 = "https://github.com/Xposed-Modules-Repo/com.rel.mujde/releases"
