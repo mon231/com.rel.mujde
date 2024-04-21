@@ -4,7 +4,6 @@ import android.util.Log
 import com.rel.mujde.Constants.PREF_ENABLE_VERBOSE_LOGS
 import com.rel.mujde.Constants.PREF_OVERRIDE_ROM_FEATURE_LEVELS
 import com.rel.mujde.Constants.PREF_SPOOF_FEATURES_LIST
-import com.rel.mujde.Constants.PREF_STRICTLY_CHECK_GOOGLE_PHOTOS
 import com.rel.mujde.Constants.SHARED_PREF_FILE_NAME
 import de.robv.android.xposed.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage

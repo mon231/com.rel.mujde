@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Paint
 import android.net.Uri
 import android.os.AsyncTask
+import android.os.AsyncTask.*
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -25,7 +26,6 @@ import com.rel.mujde.Constants.PREF_OVERRIDE_ROM_FEATURE_LEVELS
 import com.rel.mujde.Constants.PREF_SPOOF_ANDROID_VERSION_FOLLOW_DEVICE
 import com.rel.mujde.Constants.PREF_SPOOF_ANDROID_VERSION_MANUAL
 import com.rel.mujde.Constants.PREF_SPOOF_FEATURES_LIST
-import com.rel.mujde.Constants.PREF_STRICTLY_CHECK_GOOGLE_PHOTOS
 import com.rel.mujde.Constants.RELEASES_URL
 import com.rel.mujde.Constants.RELEASES_URL2
 import com.rel.mujde.Constants.SHARED_PREF_FILE_NAME
@@ -59,7 +59,7 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
     private fun showRebootSnack(){
         if (pref == null) return // don't display snackbar if module not active.
         val rootView = findViewById<ScrollView>(R.id.root_view_for_snackbar)
-        Snackbar.make(rootView, R.string.please_force_stop_google_photos, Snackbar.LENGTH_SHORT).show()
+        // TODO: stuff, ignore Snackbar.make(rootView, R.string.please_force_stop_google_photos, Snackbar.LENGTH_SHORT).show()
     }
 
     /**
@@ -98,13 +98,15 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
         startActivity(intent)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
 
         /**
          * Check if [pref] is not null. If it is, then module is not enabled.
          */
-        if (pref == null){
+        if (pref == null)
+        {
             AlertDialog.Builder(this)
                 .setMessage(R.string.module_not_enabled)
                 .setPositiveButton(R.string.close) {_, _ ->
@@ -121,10 +123,7 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
         val customizeFeatureFlags = findViewById<LinearLayout>(R.id.customize_feature_flags)
         val featureFlagsChanged = findViewById<TextView>(R.id.feature_flags_changed)
         val overrideROMFeatureLevels = findViewById<SwitchCompat>(R.id.override_rom_feature_levels)
-        val switchEnforceGooglePhotos = findViewById<SwitchCompat>(R.id.spoof_only_in_google_photos_switch)
         val deviceSpooferSpinner = findViewById<Spinner>(R.id.device_spoofer_spinner)
-        val forceStopGooglePhotos = findViewById<Button>(R.id.force_stop_google_photos)
-        val openGooglePhotos = findViewById<ImageButton>(R.id.open_google_photos)
         val advancedOptions = findViewById<TextView>(R.id.advanced_options)
         val updateAvailableLink = findViewById<TextView>(R.id.update_available_link)
         val confExport = findViewById<ImageButton>(R.id.conf_export)
@@ -137,10 +136,10 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
          * Restart the activity.
          */
         resetSettings.setOnClickListener {
+            // TODO: add here confs and preferences
             pref?.edit()?.run {
                 putString(PREF_DEVICE_TO_SPOOF, DeviceProps.defaultDeviceName)
                 putBoolean(PREF_OVERRIDE_ROM_FEATURE_LEVELS, true)
-                putBoolean(PREF_STRICTLY_CHECK_GOOGLE_PHOTOS, true)
                 putStringSet(
                     PREF_SPOOF_FEATURES_LIST,
                     DeviceProps.defaultFeatures.map { it.displayName }.toSet()
@@ -167,9 +166,7 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
             }
         }
 
-        /**
-         * See [FeatureSpoofer].
-         */
+        /* TODO: stuff
         switchEnforceGooglePhotos.apply {
             isChecked = pref?.getBoolean(PREF_STRICTLY_CHECK_GOOGLE_PHOTOS, true) ?: false
             setOnCheckedChangeListener { _, isChecked ->
@@ -180,6 +177,7 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
                 }
             }
         }
+        */
 
         /**
          * See [DeviceSpoofer].
@@ -278,7 +276,7 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
          * Yes AsyncTask is deprecated, but it works fine and for such a short network operation
          * it is useless to try coroutine or something like that.
          */
-        AsyncTask.execute {
+        execute {
             isUpdateAvailable()?.let { url ->
                 runOnUiThread {
                     updateAvailableLink.apply {
@@ -483,5 +481,4 @@ class ActivityMain: AppCompatActivity(R.layout.activity_main) {
             Toast.makeText(this, "${getString(R.string.read_error)}: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
 }

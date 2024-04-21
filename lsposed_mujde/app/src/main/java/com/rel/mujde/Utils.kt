@@ -13,7 +13,6 @@ import com.rel.mujde.Constants.PREF_OVERRIDE_ROM_FEATURE_LEVELS
 import com.rel.mujde.Constants.PREF_SPOOF_ANDROID_VERSION_FOLLOW_DEVICE
 import com.rel.mujde.Constants.PREF_SPOOF_ANDROID_VERSION_MANUAL
 import com.rel.mujde.Constants.PREF_SPOOF_FEATURES_LIST
-import com.rel.mujde.Constants.PREF_STRICTLY_CHECK_GOOGLE_PHOTOS
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedWriter
@@ -188,11 +187,13 @@ class Utils {
                 }
             }
 
+            /* TODO: add here my own prefs
             PREF_STRICTLY_CHECK_GOOGLE_PHOTOS.let { key ->
                 jsonObject.optBoolean(key, true).let {
                     putBoolean(key, it)
                 }
             }
+             */
 
             PREF_OVERRIDE_ROM_FEATURE_LEVELS.let { key ->
                 jsonObject.optBoolean(key, true).let {

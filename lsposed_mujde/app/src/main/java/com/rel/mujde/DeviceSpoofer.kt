@@ -6,12 +6,12 @@ import com.rel.mujde.Constants.PREF_DEVICE_TO_SPOOF
 import com.rel.mujde.Constants.PREF_ENABLE_VERBOSE_LOGS
 import com.rel.mujde.Constants.PREF_SPOOF_ANDROID_VERSION_FOLLOW_DEVICE
 import com.rel.mujde.Constants.PREF_SPOOF_ANDROID_VERSION_MANUAL
-import com.rel.mujde.Constants.PREF_STRICTLY_CHECK_GOOGLE_PHOTOS
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XSharedPreferences
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+
 
 /**
  * Codenames of pixels:

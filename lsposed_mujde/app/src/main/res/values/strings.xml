@@ -11,7 +11,7 @@
     changelog
     -->
 
-    <string name="app_name">Pixelify GPhotos</string>
+    <string name="app_name">Mujde</string>
 
     <!--activity_main.xml-->
     <string name="reset">Reset</string>
@@ -28,27 +28,24 @@
     <string name="force_stop_google_photos">Force stop\nGoogle Photos</string>
     <string name="module_not_enabled">
         \n
-        Looks like the this app module is not enabled.\n
-        Please enable it in LSPosed / EdXposed, then reboot.\n
-        If already enabled, then just reboot. If that does not work, kindly uninstall and reinstall.
+        Looks like mujde's module is not yet enabled.\n
+        Please enable it in LSPosed / EdXposed, then reboot the device.
     </string>
     <string name="close">Close</string>
     <string name="open_google_photos">Open Google Photos</string>
     <string name="update_available">App update available!</string>
 
     <!--changelog-->
-    <string name="version_head">Version 4.1</string>
+    <string name="version_head">Version 1.0</string>
     <string name="version_desc">
         \n
-        # In light of recent event of Vanced project getting shut down because of using Youtube logo,
-        this app\'s logo has been updated to avoid any legal conflict.\n
+        This version of Mujde is in a WIP state, and not yet ready to deploy
     </string>
 
     <!--menu_activity_main.xml-->
     <string name="changelog">Change log</string>
 
     <!--ActivityMain.xml-->
-    <string name="please_force_stop_google_photos">Please force stop Google Photos to take effect.</string>
     <string name="export_config">Export configuration</string>
     <string name="export_config_desc">Save or share your settings of this module with others.\n
         \"Save\" will prompt to select a location to export the settings as a JSON file.
