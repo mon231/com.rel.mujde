@@ -174,7 +174,6 @@ class Utils {
          * Check for field and store in shared prefs.
          */
         pref?.edit()?.apply {
-
             PREF_SPOOF_FEATURES_LIST.let { key ->
                 jsonObject.optJSONArray(key)?.let {
                     putStringSet(key, convertJsonArrayToList(it).toSet())
@@ -223,7 +222,5 @@ class Utils {
 
             apply()
         }
-
     }
-
 }
