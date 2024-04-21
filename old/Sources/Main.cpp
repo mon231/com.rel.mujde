@@ -1,3 +1,5 @@
+#include "Main.hpp"
+
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/kprobes.h>

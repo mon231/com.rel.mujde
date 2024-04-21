@@ -33,3 +33,19 @@ We'll use kernel-level hooking to catch the process creation before it executes,
 ## Credits
 [Magisk](https://github.com/topjohnwu/Magisk) <br />
 [Frida](https://github.com/frida/frida)
+
+```
+POST / HTTP/1.1
+Host: localhost:27042
+Accept-Encoding: gzip, deflate, br
+Accept: */*
+Connection: keep-alive
+Content-Length: 93
+Content-Type: application/json
+
+{
+  "type": "spawn",
+  "name": "il.idf.idfcertwallet",
+  "script": "console.log('hillow');"
+}
+```
