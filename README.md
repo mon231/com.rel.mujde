@@ -9,3 +9,7 @@
 
 ## How does it work?
 NOT IMPLEMENTED YET..
+
+## Notes and references
+1. [Xposed API](https://api.xposed.info/)
+1. [Frida API](https://frida.re/docs/javascript-api/)
