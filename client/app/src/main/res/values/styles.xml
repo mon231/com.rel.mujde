@@ -1,35 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
-        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
-    </style>
-
-    <style name="ConfigCard" parent="Widget.MaterialComponents.CardView">
-        <item name="cardElevation">2dp</item>
-        <item name="cardCornerRadius">8dp</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="cardBackgroundColor">@color/white</item>
-    </style>
-
-    <style name="ConfigTextField" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/accent</item>
-        <item name="hintTextColor">@color/accent</item>
-        <item name="android:textColorHint">@color/text_secondary</item>
-    </style>
-
-    <style name="AddButton" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/accent</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:padding">16dp</item>
+    <!-- SearchView style for black background with white text -->
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <!-- Text color -->
+        <item name="android:textColorHint">@color/teal_200</item>
+        <item name="android:textColor">@android:color/white</item>
+        
+        <!-- Search icon color -->
+        <item name="searchIcon">@drawable/ic_search_white</item>
+        <item name="closeIcon">@drawable/ic_close_white</item>
+        <item name="queryBackground">@android:color/transparent</item>
+        <item name="searchHintIcon">@null</item>
     </style>
 </resources>

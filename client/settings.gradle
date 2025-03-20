@@ -1,2 +1,11 @@
-rootProject.name = "mujde"
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://api.xposed.info/' }
+    }
+}
+
+rootProject.name = "Mujde"
 include ':app'

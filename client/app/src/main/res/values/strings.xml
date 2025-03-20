@@ -1,85 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
-
-    <!--Things to update in new versions:
-
-    build.gradle: versionCode
-    build.gradle: versionName
-
-    update_info.json
-
-    changelog
-    -->
-
     <string name="app_name">Mujde</string>
-
-    <!--activity_main.xml-->
-    <string name="reset">Reset</string>
-    <string name="device_to_spoof">Device to spoof</string>
-    <string name="spoofs_build_and_features">Spoofs build.prop and feature flags.</string>
-    <string name="customize_feature_flags">Customize feature flags.</string>
-    <string name="feature_flags_changed">Feature flags changed!</string>
-    <string name="spoof_only_in_google_photos">Make sure to spoof only in Google Photos.</string>
-    <string name="spoof_only_in_google_photos_desc">In LSPosed, the module is by default only activated for Google Photos.
-    If you want to use it in other apps, then keep this toggle <b>OFF</b>.</string>
-    <string name="override_rom_feature_levels">Override ROM feature levels.</string>
-    <string name="override_rom_feature_levels_desc">Pass false to hooked method for higher feature levels present in ROM
-    if user selects a lower Pixel feature level. <b>(Recommended)</b></string>
-    <string name="force_stop_google_photos">Force stop\nGoogle Photos</string>
-    <string name="module_not_enabled">
-        \n
-        Looks like mujde\'s module is not yet enabled.\n
-        Please enable it in LSPosed / EdXposed, then reboot the device.
-    </string>
+    <string name="module_not_enabled">Module is not enabled. Please enable it in LSPosed/EdXposed Manager.</string>
     <string name="close">Close</string>
-    <string name="open_google_photos">Open Google Photos</string>
-    <string name="update_available">App update available!</string>
+    <string name="search_apps">Search apps…</string>
+    <string name="no_apps_found">No apps found. Try a different search query.</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="settings_saved">Settings saved successfully</string>
+    <string name="error_saving_settings">Error saving settings</string>
+    <string name="error_loading_apps">Error loading applications. Please try again.</string>
+    <string name="app_icon">App icon</string>
 
-    <!--changelog-->
-    <string name="version_head">Version 1.0</string>
-    <string name="version_desc">
-        \n
-        This version of Mujde is in a WIP state, and not yet ready to deploy
-    </string>
-
-    <!--menu_activity_main.xml-->
-    <string name="changelog">Change log</string>
-
-    <!--ActivityMain.xml-->
-    <string name="export_config">Export configuration</string>
-    <string name="export_config_desc">Save or share your settings of this module with others.\n
-        \"Save\" will prompt to select a location to export the settings as a JSON file.
-    </string>
-    <string name="export_complete">Export complete!</string>
-    <string name="share">Share</string>
-    <string name="select_a_location">Select a location to save.</string>
-    <string name="share_config_file">Share configuration file</string>
-    <string name="import_config">Import configuration</string>
-    <string name="import_config_desc">This will open a system window to select the configuration file.</string>
-    <string name="share_error">Share error!</string>
-    <string name="read_error">Read error! Make sure to select a proper file!</string>
-    <string name="import_complete">Import complete!</string>
-    <string name="advanced_options">Advanced options</string>
-
-    <!--feature_customize.xml-->
+    <string name="unsaved_changes_title">Unsaved Changes</string>
+    <string name="unsaved_changes_message">You have unsaved changes. What would you like to do?</string>
+    <string name="save_and_exit">Save and Exit</string>
+    <string name="discard_and_exit">Discard and Exit</string>
+    <string name="cancel">Cancel</string>
+    <string-array name="module_scope">
+        <item>com.linkedin.android</item>
+        <item>com.instagram.android</item>
+    </string-array>
+    
+    <!-- Navigation -->
+    <string name="title_home">Home</string>
+    <string name="title_scripts">Scripts</string>
+    <string name="title_apps">Apps</string>
+    
+    <string name="select">Select</string>
     <string name="save">Save</string>
-
-    <!--advanced_options_activity.xml-->
-    <string name="enable_verbose_logging">Enable verbose logging</string>
-    <string name="enable_verbose_logging_desc">More debug information in LSPosed / EdXposed logs and Android logcat.\n
-        To share logs, open LSPosed / EdXposed -> Logs -> top Save icon. Then share the created file.
-    </string>
-    <string name="spoof_android_version">Spoof android version.</string>
-    <string name="spoof_android_version_desc">Do not set an Android version greater than your current version.\n
-        Example, if your Android version is <b>Pie</b>, you can set <b>Nougat / Oreo / Pie</b>, but not Q / R / S.
-    </string>
-    <string name="this_might_cause_crash">This might cause Google Photos to immediately crash!</string>
-    <string name="dont_spoof_android_version">Don\'t spoof Android version <b>(Recommended)</b></string>
-    <string name="follow_spoof_device_version">Follow spoof device Android version.</string>
-    <string name="manually_set_android_version">Manually set Android version.</string>
-
-    <!--Utils.kt-->
-    <string name="killing_please_wait">Killing… please wait.</string>
-    <string name="failed_to_stop_package">Failed to stop package. Please stop manually.</string>
-    <string name="failed_to_launch_package">Failed to launch. Please start manually.</string>
+    
+    <!-- Script Selection -->
+    <string name="script_count">%1$d scripts selected</string>
+    <string name="no_scripts_selected">No scripts selected</string>
+    <string name="select_scripts_for_app">Select Scripts for this App</string>
 </resources>
