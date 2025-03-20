@@ -1,15 +1,10 @@
 package com.rel.mujde.server.model;
 
-/**
- * Represents an Android application.
- */
 public class App {
     private int appId;
     private String packageName;
 
-    public App() {
-        // Default constructor for JAX-RS
-    }
+    public App() { }
 
     public App(int appId, String packageName) {
         this.appId = appId;
@@ -35,8 +30,8 @@ public class App {
     @Override
     public String toString() {
         return "App{" +
-                "appId=" + appId +
-                ", packageName='" + packageName + '\'' +
+                " appId=" + appId +
+                ", packageName='" + packageName + "'" +
                 '}';
     }
 }

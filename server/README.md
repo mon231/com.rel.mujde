@@ -55,3 +55,66 @@ NOTE that app-id is the package name, e.g. `com.tranzmate`
 |-----------|--------|-------------|
 | `app_id`  | INT (PK, FK) | Associated application. |
 | `script_id` | INT (PK, FK) | Associated script. |
+
+## Building and Running the Server
+
+### Prerequisites
+- Java Development Kit (JDK) 11 or later
+- Apache Maven
+
+### Build Instructions
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/mujde-server.git
+   cd mujde-server
+   ```
+
+2. Build the project:
+   ```bash
+   mvn clean package
+   ```
+
+### Running the Server
+The server can be run on both Windows and Linux platforms.
+
+#### On Windows
+```bash
+run.bat [options]
+```
+
+#### On Linux
+```bash
+chmod +x run.sh
+./run.sh [options]
+```
+
+#### Command Line Options
+- `-p, --port PORT`: Specify the port to run the server on (default: 8080)
+- `-h, --host HOST`: Specify the host to bind to (default: 0.0.0.0)
+
+Example:
+```bash
+./run.sh -p 9090 -h localhost
+```
+
+## API Usage Examples
+
+### Register an Application
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"packageName":"com.example.app"}' http://localhost:8080/apps
+```
+
+### Upload a Script
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"scriptName":"logger","content":"console.log(\"Hook installed\")"}' http://localhost:8080/scripts
+```
+
+### Associate a Script with an App
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"packageName":"com.example.app","scriptName":"logger"}' http://localhost:8080/injections
+```
+
+### Get Scripts for an App
+```bash
+curl http://localhost:8080/injections/by_app/com.example.app
+```

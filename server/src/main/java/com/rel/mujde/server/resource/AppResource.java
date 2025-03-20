@@ -10,9 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * RESTful resource for managing applications.
- */
 @Path("/apps")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -24,9 +21,6 @@ public class AppResource {
         this.dbManager = DatabaseManager.getInstance();
     }
 
-    /**
-     * Retrieves all registered applications.
-     */
     @GET
     public Response getAllApps() {
         try {
@@ -40,9 +34,6 @@ public class AppResource {
         }
     }
 
-    /**
-     * Registers a new application.
-     */
     @POST
     public Response addApp(App app) {
         try {
@@ -71,19 +62,18 @@ public class AppResource {
         }
     }
 
-    /**
-     * Retrieves details of a specific application by ID.
-     */
     @GET
     @Path("/{id}")
     public Response getAppById(@PathParam("id") int appId) {
         try {
             App app = dbManager.getAppById(appId);
+
             if (app == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity("Application with ID " + appId + " not found")
                         .build();
             }
+
             return Response.ok(app).build();
         } catch (Exception e) {
             logger.error("Error getting app by ID: {}", appId, e);
@@ -93,9 +83,6 @@ public class AppResource {
         }
     }
 
-    /**
-     * Removes an application from the database.
-     */
     @DELETE
     @Path("/{app_id}")
     public Response deleteApp(@PathParam("app_id") int appId) {

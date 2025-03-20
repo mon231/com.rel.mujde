@@ -12,9 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * RESTful resource for managing Frida scripts.
- */
 @Path("/scripts")
 @Produces(MediaType.APPLICATION_JSON)
 public class ScriptResource {
@@ -27,9 +24,6 @@ public class ScriptResource {
         this.scriptFileHandler = new ScriptFileHandler();
     }
 
-    /**
-     * Retrieves all available scripts.
-     */
     @GET
     public Response getAllScripts() {
         try {
@@ -43,47 +37,41 @@ public class ScriptResource {
         }
     }
 
-    /**
-     * Uploads a new script or updates an existing one.
-     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addScript(Script script) {
         try {
             if (script.getScriptName() == null || script.getScriptName().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Script name is required")
+                        .entity("Script name can't be empty")
                         .build();
             }
 
             if (script.getContent() == null || script.getContent().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Script content is required")
+                        .entity("Script content can't be empty")
                         .build();
             }
 
-            // Check if script already exists
             Script existingScript = dbManager.getScriptByName(script.getScriptName());
+
             if (existingScript != null) {
-                // Update existing script
                 scriptFileHandler.writeScriptContent(existingScript.getScriptPath(), script.getContent());
                 existingScript.setLastModified(LocalDateTime.now());
+
                 if (script.getNetworkPath() != null && !script.getNetworkPath().isEmpty()) {
                     existingScript.setNetworkPath(script.getNetworkPath());
                 }
-                dbManager.updateScript(existingScript);
 
+                dbManager.updateScript(existingScript);
                 return Response.ok(existingScript).build();
             } else {
-                // Create new script
                 String scriptPath = scriptFileHandler.generateUniqueScriptPath();
+
                 script.setScriptPath(scriptPath);
                 script.setLastModified(LocalDateTime.now());
 
-                // Save script to database
                 Script addedScript = dbManager.addScript(script);
-
-                // Write script content to file
                 scriptFileHandler.writeScriptContent(scriptPath, script.getContent());
 
                 return Response.status(Response.Status.CREATED)
@@ -98,21 +86,18 @@ public class ScriptResource {
         }
     }
 
-    /**
-     * Retrieves a specific script by ID.
-     */
     @GET
     @Path("/{script_id}")
     public Response getScriptById(@PathParam("script_id") int scriptId) {
         try {
             Script script = dbManager.getScriptById(scriptId);
+
             if (script == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity("Script with ID " + scriptId + " not found")
                         .build();
             }
 
-            // Read script content
             String content = scriptFileHandler.readScriptContent(script.getScriptPath());
             script.setContent(content);
 
@@ -125,22 +110,25 @@ public class ScriptResource {
         }
     }
 
-    /**
-     * Updates the content of an existing script.
-     */
     @PUT
     @Path("/{script_id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateScript(@PathParam("script_id") int scriptId, Script updatedScript) {
         try {
             Script existingScript = dbManager.getScriptById(scriptId);
+
             if (existingScript == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity("Script with ID " + scriptId + " not found")
                         .build();
             }
 
-            // Update script properties if provided
+            if (updatedScript.getScriptId() != scriptId){
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Script ID in URL path and request body don't match")
+                        .build();
+            }
+
             if (updatedScript.getScriptName() != null && !updatedScript.getScriptName().isEmpty()) {
                 existingScript.setScriptName(updatedScript.getScriptName());
             }
@@ -149,15 +137,17 @@ public class ScriptResource {
                 existingScript.setNetworkPath(updatedScript.getNetworkPath());
             }
 
-            // Update script content if provided
             if (updatedScript.getContent() != null && !updatedScript.getContent().isEmpty()) {
                 scriptFileHandler.writeScriptContent(existingScript.getScriptPath(), updatedScript.getContent());
-            } else if (existingScript.getNetworkPath() != null && !existingScript.getNetworkPath().isEmpty()) {
+            } else if (existingScript.getNetworkPath() != null) {
                 // If content not provided but network path exists, update from URL
                 scriptFileHandler.updateScriptFromUrl(existingScript);
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity("Invalid request: content or network path is required")
+                .build();
             }
 
-            // Update last modified timestamp
             existingScript.setLastModified(LocalDateTime.now());
             dbManager.updateScript(existingScript);
 
@@ -170,31 +160,53 @@ public class ScriptResource {
         }
     }
 
-    /**
-     * Removes a script.
-     */
+    @POST
+    @Path("/update")
+    public Response updateScripts() {
+        try {
+            List<Script> scripts = dbManager.getAllScripts();
+
+            for (Script script : scripts) {
+                if (script.getNetworkPath() == null) {
+                    continue;
+                }
+
+                scriptFileHandler.updateScriptFromUrl(script);
+                script.setLastModified(LocalDateTime.now());
+                dbManager.updateScript(script);
+            }
+
+            return Response.ok().build();
+        } catch (Exception e) {
+            logger.error("Error updating scripts", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error updating scripts: " + e.getMessage())
+                    .build();
+        }
+    }
+
     @DELETE
     @Path("/{script_id}")
     public Response deleteScript(@PathParam("script_id") int scriptId) {
         try {
             Script script = dbManager.getScriptById(scriptId);
+
             if (script == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity("Script with ID " + scriptId + " not found")
                         .build();
             }
 
-            // Delete script file
             boolean fileDeleted = scriptFileHandler.deleteScriptFile(script.getScriptPath());
             if (!fileDeleted) {
                 logger.warn("Script file {} not found or could not be deleted", script.getScriptPath());
             }
 
-            // Delete script from database
             boolean dbDeleted = dbManager.deleteScript(scriptId);
             if (dbDeleted) {
                 return Response.status(Response.Status.NO_CONTENT).build();
             } else {
+                logger.warn("Script {} wasn't deleted from DB", script.getScriptName());
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity("Failed to delete script from database")
                         .build();
