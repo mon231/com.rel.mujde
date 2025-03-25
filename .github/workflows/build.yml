@@ -1,5 +1,9 @@
 name: Build Mujde apk for LSPosed
-on: push
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:

@@ -36,14 +36,14 @@ android {
         warningsAsErrors false
     }
 
-    // Add support for Frida Gadget in jniLibs directory
     sourceSets {
         main {
+            // Add support for Frida binary in jniLibs directory
             jniLibs.srcDirs = ['src/main/jniLibs']
         }
     }
 
-    // Define Frida Gadget version
+    // Define prefered Frida version
     ext {
         fridaVersion = '16.7.0'
     }
@@ -54,7 +54,7 @@ android {
         xzTools
     }
 
-    // Add dependencies
+    // Add configuration dependencies
     dependencies {
         downloader 'de.undercouch:gradle-download-task:5.4.0'
         xzTools 'org.tukaani:xz:1.9'
@@ -63,8 +63,8 @@ android {
     // Apply the download plugin
     apply plugin: 'de.undercouch.download'
 
-    // Task to download Frida Gadget libraries
-    task downloadFridaGadget {
+    // Task to download Frida binary
+    task downloadFrida {
         doLast {
             // Add XZ library to classpath
             URLClassLoader loader = new URLClassLoader(
@@ -94,8 +94,8 @@ android {
 
             // Download and extract for each architecture
             architectures.each { arch, outputFile ->
-                if (outputFile.exists() && outputFile.size() != 0) {
-                    println "Frida Gadget for ${arch} already exists"
+                if (outputFile.exists()) {
+                    println "Frida for ${arch} already exists"
                     return
                 }
 
@@ -103,34 +103,31 @@ android {
                 tempDir.mkdirs()
 
                 def injectorName = "frida-inject-${fridaVersion}-${arch}.xz"
-                def tempFile = new File(tempDir, injectorName)
+                def compressedInjector = new File(tempDir, injectorName)
                 def url = "https://github.com/frida/frida/releases/download/${fridaVersion}/${injectorName}"
 
-                println "Downloading Frida Gadget for ${arch} from ${url}"
+                println "Downloading Frida for ${arch} from ${url}"
 
                 try {
                     // Download the file
                     download {
                         src url
-                        dest tempFile
+                        dest compressedInjector
                         overwrite true
                     }
 
-                    // Extract the file
-                    if (!tempFile.exists()) {
-                        println "Downloaded file does not exist at: ${tempFile.absolutePath}"
+                    if (!compressedInjector.exists()) {
+                        println "Downloaded file does not exist at: ${compressedInjector.absolutePath}"
                         return
                     }
 
-                    println "Extracting Frida Gadget for ${arch}..."
-                    println "File exists at: ${tempFile.absolutePath}"
+                    println "Extracting Frida for ${arch}..."
 
-                    // Use XZ library for extraction
-                    def extractedFilePath = tempFile.absolutePath.replace('.xz', '')
+                    def extractedFilePath = compressedInjector.absolutePath.replace('.xz', '')
                     def extractedFile = new File(extractedFilePath)
 
                     def XZInputStream = loader.loadClass('org.tukaani.xz.XZInputStream')
-                    tempFile.withInputStream { fis ->
+                    compressedInjector.withInputStream { fis ->
                         def xzIn = XZInputStream.getConstructor(java.io.InputStream.class).newInstance(fis)
                         xzIn.withStream { xzis ->
                             extractedFile.withOutputStream { fos ->
@@ -139,22 +136,18 @@ android {
                         }
                     }
 
-                    if (extractedFile.exists()) {
-                        extractedFile.renameTo(outputFile)
-                        println "Successfully extracted Frida Gadget for ${arch}"
-                    } else {
-                        println "Failed to extract Frida Gadget for ${arch}"
-                    }
+                    extractedFile.renameTo(outputFile)
+                    println "Successfully extracted Frida for ${arch}"
                 } catch (Exception e) {
-                    println "Error processing Frida Gadget for ${arch}: ${e.message}"
+                    println "Error processing Frida for ${arch}: ${e.message}"
                     e.printStackTrace()
                 }
             }
         }
     }
 
-    // Make preBuild depend on downloadFridaGadget
-    preBuild.dependsOn downloadFridaGadget
+    // Make preBuild depend on downloadFrida
+    preBuild.dependsOn downloadFrida
 
     // Fallback method: create empty placeholder files if download fails
     // This ensures the build succeeds even if downloads fail
@@ -176,9 +169,9 @@ android {
         }
     }
 
-    // Make downloadFridaGadget finalizedBy createFridaPlaceholders
+    // Make downloadFrida finalizedBy createFridaPlaceholders
     // This ensures we always have the files needed for the build
-    downloadFridaGadget.finalizedBy createFridaPlaceholders
+    downloadFrida.finalizedBy createFridaPlaceholders
 }
 
 repositories {
