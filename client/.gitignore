@@ -55,6 +55,8 @@ libfrida-gadget.so
 *.so.xz
 frida-server*
 frida-gadget*
+frida-inject*
+app/src/main/jniLibs/**/*.so
 
 # Keystore files
 *.jks
@@ -97,6 +99,11 @@ lint/reports/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Database files
+*.db
+*.db-journal
+sqlite.db
 
 # Temporary files
 *.tmp

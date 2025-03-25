@@ -5,6 +5,9 @@ import com.rel.mujde.server.resource.InjectionResource;
 import com.rel.mujde.server.resource.ScriptResource;
 import com.rel.mujde.server.serializer.JacksonConfig;
 
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+
 import jakarta.ws.rs.core.UriBuilder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -43,7 +46,13 @@ public class Main {
             URI serverBindings = getServerBindings(args);
             ResourceConfig config = new ResourceConfig();
 
+            // Register Jackson for JSON serialization
             config.register(JacksonConfig.class);
+            config.register(JacksonFeature.class);
+            config.register(JacksonJaxbJsonProvider.class);
+            config.packages("com.rel.mujde.server");
+            
+            // Register resources
             config.register(AppResource.class);
             config.register(ScriptResource.class);
             config.register(InjectionResource.class);

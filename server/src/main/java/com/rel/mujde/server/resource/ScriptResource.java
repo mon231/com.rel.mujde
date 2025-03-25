@@ -1,5 +1,8 @@
 package com.rel.mujde.server.resource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rel.mujde.server.db.DatabaseManager;
 import com.rel.mujde.server.model.Script;
 import com.rel.mujde.server.service.ScriptFileHandler;
@@ -16,6 +19,16 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class ScriptResource {
     private static final Logger logger = LoggerFactory.getLogger(ScriptResource.class);
+    private static final ObjectMapper objectMapper;
+    
+    static {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        // Enable pretty printing for debugging
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
+    
     private final DatabaseManager dbManager;
     private final ScriptFileHandler scriptFileHandler;
 
@@ -25,10 +38,13 @@ public class ScriptResource {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAllScripts() {
         try {
             List<Script> scripts = dbManager.getAllScripts();
-            return Response.ok(scripts).build();
+            // Convert to JSON string manually to avoid serialization issues
+            String jsonScripts = objectMapper.writeValueAsString(scripts);
+            return Response.ok(jsonScripts, MediaType.APPLICATION_JSON).build();
         } catch (Exception e) {
             logger.error("Error retrieving all scripts", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

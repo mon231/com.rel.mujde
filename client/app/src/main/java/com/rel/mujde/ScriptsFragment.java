@@ -3,6 +3,7 @@ package com.rel.mujde;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 // Removed unused AdapterView import
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,7 +83,7 @@ public class ScriptsFragment extends Fragment {
         listViewScripts.setAdapter(scriptsAdapter);
         
         // Set up click listeners
-        setupListeners();
+        setupListeners(view);
         
         // Load scripts
         loadScripts();
@@ -89,9 +91,27 @@ public class ScriptsFragment extends Fragment {
         return view;
     }
     
-    private void setupListeners() {
+    private void setupListeners(View view) {
         // FAB click listener to add a new script
         fabAddScript.setOnClickListener(v -> showAddScriptDialog());
+        
+        // Cloud FAB click listener to open remote scripts activity
+        FloatingActionButton fabCloud = view.findViewById(R.id.fab_cloud);
+        fabCloud.setOnClickListener(v -> {
+            // Check if repository is configured
+            SharedPreferences prefs = requireContext().getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
+            String repository = prefs.getString(Constants.PREF_SCRIPTS_REPOSITORY, null);
+            
+            if (repository == null || repository.isEmpty()) {
+                Toast.makeText(requireContext(), "Please configure repository URL in Home tab first", Toast.LENGTH_LONG).show();
+                return;
+            }
+            
+            // Open remote scripts activity
+            Intent intent = new Intent(requireContext(), RemoteScriptsActivity.class);
+            startActivity(intent);
+        });
+        
         // No longer using click/long-click listeners on list items
         // Edit and delete functionality is now handled by buttons in each list item
     }

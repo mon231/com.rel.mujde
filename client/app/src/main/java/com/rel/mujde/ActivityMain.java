@@ -44,7 +44,19 @@ public class ActivityMain extends AppCompatActivity {
                     .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            finish();
+                            // Fully terminate the app process so context is reloaded when LSPosed module is enabled
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(1);
+                        }
+                    })
+                    .setNegativeButton(R.string.continue_anyway, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue with limited functionality
+                            pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+                            initializeFragments();
+                            setupNavigation();
+                            setupBackPressHandling();
                         }
                     })
                     .setCancelable(false)

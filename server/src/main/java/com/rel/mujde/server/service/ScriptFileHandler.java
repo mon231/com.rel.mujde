@@ -32,9 +32,16 @@ public class ScriptFileHandler {
 
     public String readScriptContent(String scriptPath) {
         try {
-            return new String(
-                Files.readAllBytes(Paths.get(SCRIPTS_DIR + File.separator + scriptPath)),
-                    StandardCharsets.UTF_8);
+            // Check if the scriptPath already contains the SCRIPTS_DIR prefix
+            String fullPath;
+            if (scriptPath.startsWith(SCRIPTS_DIR)) {
+                fullPath = scriptPath;
+            } else {
+                fullPath = SCRIPTS_DIR + File.separator + scriptPath;
+            }
+            
+            logger.debug("Reading script content from path: {}", fullPath);
+            return new String(Files.readAllBytes(Paths.get(fullPath)), StandardCharsets.UTF_8);
         } catch (IOException e) {
             logger.error("Error reading script content from {}", scriptPath, e);
             throw new RuntimeException("Error reading script content", e);
@@ -43,7 +50,16 @@ public class ScriptFileHandler {
 
     public void writeScriptContent(String scriptPath, String content) {
         try {
-            Files.write(Paths.get(SCRIPTS_DIR + File.separator + scriptPath), content.getBytes(StandardCharsets.UTF_8));
+            // Check if the scriptPath already contains the SCRIPTS_DIR prefix
+            String fullPath;
+            if (scriptPath.startsWith(SCRIPTS_DIR)) {
+                fullPath = scriptPath;
+            } else {
+                fullPath = SCRIPTS_DIR + File.separator + scriptPath;
+            }
+            
+            logger.debug("Writing script content to path: {}", fullPath);
+            Files.write(Paths.get(fullPath), content.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             logger.error("Error writing script content to {}", scriptPath, e);
             throw new RuntimeException("Error writing script content", e);

@@ -2,8 +2,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
     <string name="app_name">Mujde</string>
-    <string name="module_not_enabled">Module is not enabled. Please enable it in LSPosed/EdXposed Manager.</string>
+    <string name="module_not_enabled">LSPosed module is not enabled. Some features requiring Frida Gadget injection will be limited. Enable the module in LSPosed/EdXposed Manager and restart this app for full functionality.</string>
     <string name="close">Close</string>
+    <string name="continue_anyway">Continue Anyway</string>
     <string name="search_apps">Search apps…</string>
     <string name="no_apps_found">No apps found. Try a different search query.</string>
     <string name="save_settings">Save Settings</string>
@@ -24,7 +25,7 @@
     
     <!-- Navigation -->
     <string name="title_home">Home</string>
-    <string name="title_scripts">Scripts</string>
+    <string name="title_scripts">Repository</string>
     <string name="title_apps">Apps</string>
     
     <string name="select">Select</string>
