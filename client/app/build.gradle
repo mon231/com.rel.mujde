@@ -80,7 +80,9 @@ android {
             x86Dir.mkdirs()
             x86_64Dir.mkdirs()
 
+            // binaries must have lib<name>.so format for android to extract them
             def injectorFileName = 'libfrida-inject.so'
+
             def architectures = [
                 'android-arm64': new File(arm64Dir, injectorFileName),
                 'android-arm': new File(armDir, injectorFileName),
