@@ -63,7 +63,6 @@ public class FridaInjectorService extends Service {
             serviceNotificaton = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Mujde Injector Service")
                 .setContentText("Mujde injector is running")
-                .setSmallIcon(android.R.drawable.ic_notification_overlay)
                 .build();
 
             final int SERVICE_ID = 845;
