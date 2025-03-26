@@ -14,16 +14,18 @@ import android.content.SharedPreferences;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import static android.content.Context.MODE_WORLD_READABLE;
 
 public class FridaInjectorService extends Service {
     private Thread injectorThread = null;
     private SharedPreferences pref = null;
     private boolean shouldContinueLooping = false;
-    private Notification serviceNotificaton = null;
-    private ConcurrentLinkedQueue<InjectionRequest> pendingRequests = new ConcurrentLinkedQueue<>();
+    private BlockingQueue<InjectionRequest> pendingRequests = new LinkedBlockingQueue<>();
     final private String CHANNEL_ID = "FrideInjectorChannel";
+    private Notification serviceNotificaton = null;
 
     @Nullable
     @Override
@@ -52,7 +54,11 @@ public class FridaInjectorService extends Service {
 
         InjectionRequest request = InjectionRequest.fromExtra(intent);
         if (request != null) {
-            pendingRequests.add(request);
+            try {
+                pendingRequests.put(request);
+            } catch (InterruptedException e) {
+                Log.e("[Mujde]", "Injection-request enqueue error: " + e.getMessage());
+            }
         }
 
         if (pref == null) {
@@ -84,6 +90,7 @@ public class FridaInjectorService extends Service {
 
         if (injectorThread != null) {
             try {
+                injectorThread.interrupt();
                 injectorThread.wait();
 
                 injectorThread = null;
@@ -94,18 +101,21 @@ public class FridaInjectorService extends Service {
         }
     }
 
+    private InjectionRequest fetchRequest()
+    {
+        try {
+            return pendingRequests.take();
+        } catch (InterruptedException e) {
+            Log.e("[Mujde]", "Injection-request dequeue error: " + e.getMessage());
+            return null;
+        }
+    }
+
     private void injectorThreadLogic() {
         String fridaInjectorPath = getApplicationInfo().nativeLibraryDir + "/libfrida-inject.so";
 
         while (shouldContinueLooping) {
-            try {
-                final long DELAY_MS = 100;
-                Thread.sleep(DELAY_MS);
-            } catch (InterruptedException e) {
-                continue;
-            }
-
-            InjectionRequest request = pendingRequests.poll();
+            InjectionRequest request = fetchRequest();
 
             if (request == null) {
                 continue;
