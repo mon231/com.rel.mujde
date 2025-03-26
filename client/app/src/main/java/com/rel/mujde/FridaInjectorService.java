@@ -85,16 +85,17 @@ public class FridaInjectorService extends Service {
     private void injectorThreadLogic() {
         while (shouldContinueLooping) {
             try {
-                String nativeLibDir = getApplicationInfo().nativeLibraryDir;
-                String fridaInjectorPath = nativeLibDir + "/frida-inject";
+                String fridaInjectorPath = getApplicationInfo().nativeLibraryDir + "/libfrida-inject.so";
 
                 // TODO: fetch pid from XSharedPreferences, inject scripts, attach to pid
                 ProcessBuilder processBuilder = new ProcessBuilder(
-                    "su", "-c", fridaInjectorPath, "-n", "com.rel.mujde", "-e"
+                    // "su", "-c", fridaInjectorPath, "-n", "com.rel.mujde", "-e"
+                    "su", "-c", fridaInjectorPath, "-h"
                 );
 
                 Process fridaProcess = processBuilder.start();
                 int exitCode = fridaProcess.waitFor();
+
                 Log.d("[Mujde]", "Frida injector exited with code: " + exitCode);
             } catch (Exception e) {
                 Log.e("[Mujde]", "Error during frida injection: " + e.getMessage());
