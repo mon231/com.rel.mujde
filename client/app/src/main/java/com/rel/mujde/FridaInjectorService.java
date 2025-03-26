@@ -10,11 +10,11 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.SharedPreferences;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
 import static android.content.Context.MODE_WORLD_READABLE;
 
 public class FridaInjectorService extends Service {
@@ -99,8 +99,8 @@ public class FridaInjectorService extends Service {
 
         while (shouldContinueLooping) {
             try {
-                final long HALF_SECOND = 500;
-                Thread.sleep(HALF_SECOND);
+                final long DELAY_MS = 100;
+                Thread.sleep(DELAY_MS);
             } catch (InterruptedException e) {
                 continue;
             }
@@ -111,20 +111,23 @@ public class FridaInjectorService extends Service {
                 continue;
             }
 
-            try {
-                // TODO: fetch pid from XSharedPreferences, inject scripts, attach to pid
-                ProcessBuilder processBuilder = new ProcessBuilder(
-                    // "su", "-c", fridaInjectorPath, "-n", "com.rel.mujde", "-e"
-                    "su", "-c", fridaInjectorPath, "-h"
-                );
+            ScriptUtils.getScriptsForPackage(request.getPackageName(), pref).forEach(script -> {
+                Log.d("[Mujde]", "about to frida-inject " + script + " into " + request.toString());
+                String scriptFullPath = getApplicationContext().getFilesDir().getAbsolutePath() + "/scripts/" + script;
 
-                Process fridaProcess = processBuilder.start();
-                int exitCode = fridaProcess.waitFor();
+                try {
+                    ProcessBuilder processBuilder = new ProcessBuilder(
+                        "su", "-c",
+                        fridaInjectorPath, "-e",
+                        "-p", String.valueOf(request.getPid()),
+                        "-s", scriptFullPath
+                    );
 
-                Log.d("[Mujde]", "Frida injector exited with code: " + exitCode);
-            } catch (Exception e) {
-                Log.e("[Mujde]", "Error during frida injection: " + e.getMessage());
-            }
+                    processBuilder.start();
+                } catch (Exception e) {
+                    Log.d("[Mujde]", "Error during frida injection: " + e.getMessage());
+                }
+            });
         }
     }
 }

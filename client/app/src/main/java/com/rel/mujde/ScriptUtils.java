@@ -76,12 +76,11 @@ public class ScriptUtils {
     }
 
     /**
-     * Get scripts for a specific package from XSharedPreferences (for Xposed module)
-     * @param packageName Package name of the app
-     * @param prefs XSharedPreferences instance
-     * @return List of script names for the app
+     * TODO: note
+     * can get both SharedPreferences and XSharedPreferences
+     * Get scripts for a specific package from SharedPreferences
      */
-    public static List<String> getScriptsForPackage(String packageName, XSharedPreferences prefs) {
+    public static List<String> getScriptsForPackage(String packageName, SharedPreferences prefs) {
         List<String> scripts = new ArrayList<>();
 
         try {
