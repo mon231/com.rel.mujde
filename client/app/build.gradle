@@ -38,53 +38,49 @@ android {
 
     sourceSets {
         main {
-            // Add support for Frida binary in jniLibs directory
+            // import frida binaries from jniLibs directory
             jniLibs.srcDirs = ['src/main/jniLibs']
         }
     }
 
-    // Define prefered Frida version
     ext {
+        // define frida version
         fridaVersion = '16.7.0'
     }
 
-    // Add a configuration for downloading dependencies
     configurations {
         downloader
         xzTools
     }
 
-    // Add configuration dependencies
     dependencies {
         downloader 'de.undercouch:gradle-download-task:5.4.0'
         xzTools 'org.tukaani:xz:1.9'
     }
 
-    // Apply the download plugin
+    // apply the web downloader plugin
     apply plugin: 'de.undercouch.download'
 
-    // Task to download Frida binary
     task downloadFrida {
         doLast {
-            // Add XZ library to classpath
+            // make xzTools library importable
             URLClassLoader loader = new URLClassLoader(
                 configurations.xzTools.files.collect { it.toURI().toURL() } as URL[],
                 getClass().getClassLoader()
             )
 
-            // Create directories for different architectures
             def jniLibsDir = new File(projectDir, 'src/main/jniLibs')
-            def arm64Dir = new File(jniLibsDir, 'arm64-v8a')
-            def armDir = new File(jniLibsDir, 'armeabi-v7a')
             def x86Dir = new File(jniLibsDir, 'x86')
             def x86_64Dir = new File(jniLibsDir, 'x86_64')
+            def armDir = new File(jniLibsDir, 'armeabi-v7a')
+            def arm64Dir = new File(jniLibsDir, 'arm64-v8a')
 
             arm64Dir.mkdirs()
             armDir.mkdirs()
             x86Dir.mkdirs()
             x86_64Dir.mkdirs()
 
-            def injectorFileName = 'frida-inject'
+            def injectorFileName = 'libfrida-inject.so'
             def architectures = [
                 'android-arm64': new File(arm64Dir, injectorFileName),
                 'android-arm': new File(armDir, injectorFileName),
@@ -92,10 +88,10 @@ android {
                 'android-x86_64': new File(x86_64Dir, injectorFileName)
             ]
 
-            // Download and extract for each architecture
+            // download and extract frida-inject for each architecture
             architectures.each { arch, outputFile ->
                 if (outputFile.exists()) {
-                    println "Frida for ${arch} already exists"
+                    println "frida for ${arch} already exists"
                     return
                 }
 
@@ -106,10 +102,9 @@ android {
                 def compressedInjector = new File(tempDir, injectorName)
                 def url = "https://github.com/frida/frida/releases/download/${fridaVersion}/${injectorName}"
 
-                println "Downloading Frida for ${arch} from ${url}"
+                println "Downloading frida for ${arch} from ${url}"
 
                 try {
-                    // Download the file
                     download {
                         src url
                         dest compressedInjector
@@ -146,32 +141,7 @@ android {
         }
     }
 
-    // Make preBuild depend on downloadFrida
     preBuild.dependsOn downloadFrida
-
-    // Fallback method: create empty placeholder files if download fails
-    // This ensures the build succeeds even if downloads fail
-    task createFridaPlaceholders {
-        doLast {
-            def jniLibsDir = new File(projectDir, 'src/main/jniLibs')
-            def architectures = ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']
-
-            architectures.each { arch ->
-                def dir = new File(jniLibsDir, arch)
-                dir.mkdirs()
-
-                def outputFile = new File(dir, 'frida-inject')
-                if (!outputFile.exists()) {
-                    println "Creating placeholder for ${arch}/frida-inject"
-                    outputFile.createNewFile()
-                }
-            }
-        }
-    }
-
-    // Make downloadFrida finalizedBy createFridaPlaceholders
-    // This ensures we always have the files needed for the build
-    downloadFrida.finalizedBy createFridaPlaceholders
 }
 
 repositories {
@@ -188,12 +158,11 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.cardview:cardview:1.0.0'
 
-    // Retrofit for API calls
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.google.code.gson:gson:2.8.9'
 
-    // Xposed API
+    // Xposed hooks API
     compileOnly 'de.robv.android.xposed:api:82'
     compileOnly 'de.robv.android.xposed:api:82:sources'
 }
