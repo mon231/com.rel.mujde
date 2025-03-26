@@ -1,5 +1,6 @@
 package com.rel.mujde;
 
+import android.util.Log;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import java.io.FileReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import android.content.Intent;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -23,7 +25,7 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public class FeatureSpoofer implements IXposedHookLoadPackage {
+public class InjectionRequester implements IXposedHookLoadPackage {
     private XSharedPreferences pref;
 
     private void log(String message) {
@@ -76,22 +78,12 @@ public class FeatureSpoofer implements IXposedHookLoadPackage {
             return;
         }
 
-        // Hook Activity.onCreate to inject scripts
         hookActivityOnCreate(lpparam, scripts);
     }
-
-    /**
-     * Read the content of a script file
-     * @param scriptName Name of the script file
-     * @return List of lines in the script file
-     */
-
 
     // TODO: ensure no scripts are stored in sharedpref, all in dedicatedfolder
 
     // TODO: move this code to service
-
-
 
     // private List<String> readScriptContent(String scriptName) {
     //     List<String> lines = new ArrayList<>();
@@ -140,15 +132,6 @@ public class FeatureSpoofer implements IXposedHookLoadPackage {
     //     return lines;
     // }
 
-    /**
-     * Inject Frida scripts into target application
-     * @param context Context to use for script injection
-     * @param scriptNames List of script names to inject
-     */
-    private void injectFridaScripts(final Context context, final List<String> scriptNames) {
-        // TODO: add to XSharedPreferences, sleep 3sec
-    }
-
     private void hookActivityOnCreate(XC_LoadPackage.LoadPackageParam lpparam, final List<String> scripts) {
         try {
             XposedHelpers.findAndHookMethod(
@@ -159,32 +142,29 @@ public class FeatureSpoofer implements IXposedHookLoadPackage {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            final Activity activity = (Activity) param.thisObject;
+                            final Activity activity = (Activity)param.thisObject;
                             final String packageName = activity.getPackageName();
                             final String appName = activity.getApplicationInfo().loadLabel(activity.getPackageManager()).toString();
 
                             // Show toast on the main thread
+                            // TODO: do we want delay?
                             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    getPreferences()
-                                    .edit()
-                                    .putInt("pid_to_hook", Process.myPid())
-                                    .apply();
+                                    try {
+                                        String toastMessage = "Mujde: " + appName + " ("+packageName+") is running " + scripts.size() + " scripts";
+                                        Toast toast = Toast.makeText(activity, toastMessage, Toast.LENGTH_LONG);
+                                        toast.setDuration(3000); // 3 seconds
+                                        toast.show();
+                                        Log.d("[Mujde]", "Showed toast for " + packageName + " with " + scripts.size() + " scripts");
 
-
-                                    // try {
-                                    //     String toastMessage = "Mujde: " + appName + " ("+packageName+") is running " + scripts.size() + " scripts";
-                                    //     Toast toast = Toast.makeText(activity, toastMessage, Toast.LENGTH_LONG);
-                                    //     toast.setDuration(3000); // 3 seconds
-                                    //     toast.show();
-                                    //     log("Showed toast for " + packageName + " with " + scripts.size() + " scripts");
-
-                                    //     // Inject Frida scripts
-                                    //     injectFridaScripts(activity, scripts);
-                                    // } catch (Exception e) {
-                                    //     log("Error showing toast: " + e.getMessage());
-                                    // }
+                                        Intent intent = new Intent("com.rel.mujde.INJECT_REQUEST");
+                                        intent.putExtra("proc_id", Process.myPid());
+                                        intent.putExtra("pkg_name", packageName);
+                                        activity.sendBroadcast(intent);
+                                    } catch (Exception e) {
+                                        Log.d("[Mujde]", "Error showing toast: " + e.getMessage());
+                                    }
                                 }
                             }, 1000); // Delay by 1 second to ensure the activity is fully created
                         }
