@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
 
     <application
         android:label="@string/app_name"
@@ -33,7 +34,12 @@
             android:name="xposedscope"
             android:resource="@array/module_scope" />
 
-        <activity 
+        <service
+            android:name=".FridaInjectorService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <activity
             android:name=".ActivityMain"
             android:exported="true">
             <intent-filter>
@@ -41,13 +47,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <activity
             android:name=".ScriptSelectionActivity"
             android:exported="false"
             android:theme="@style/Theme.MujdeTheme"
             android:parentActivityName=".ActivityMain" />
-            
+
         <activity
             android:name=".RemoteScriptsActivity"
             android:exported="false"

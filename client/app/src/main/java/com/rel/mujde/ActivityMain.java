@@ -1,20 +1,21 @@
 package com.rel.mujde;
 
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.content.Intent;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.activity.OnBackPressedCallback;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ActivityMain extends AppCompatActivity {
     private SharedPreferences pref;
@@ -28,6 +29,9 @@ public class ActivityMain extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent startServiceIntent = new Intent(this, FridaInjectorService.class);
+        startService(startServiceIntent);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -78,7 +82,7 @@ public class ActivityMain extends AppCompatActivity {
                     bottomNavigationView.setSelectedItemId(R.id.navigation_home);
                     return;
                 }
-                
+
                 // Check if we have unsaved changes in the apps fragment
                 if (appsFragment != null && appsFragment.hasUnsavedChanges()) {
                     new AlertDialog.Builder(ActivityMain.this)
@@ -105,23 +109,23 @@ public class ActivityMain extends AppCompatActivity {
             }
         });
     }
-    
+
     private void initializeFragments() {
         homeFragment = new HomeFragment();
         scriptsFragment = new ScriptsFragment();
         appsFragment = new AppsFragment();
-        
+
         // Initialize with home fragment, but don't select it in the navigation yet
         loadFragment(homeFragment);
     }
-    
+
     private void setupNavigation() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
-                
+
                 if (itemId == R.id.navigation_home) {
                     loadFragment(homeFragment);
                     return true;
@@ -132,22 +136,22 @@ public class ActivityMain extends AppCompatActivity {
                     loadFragment(appsFragment);
                     return true;
                 }
-                
+
                 return false;
             }
         });
-        
+
         // Set Home tab as selected by default
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
     }
-    
+
     private void loadFragment(Fragment fragment) {
         if (fragment != null) {
             currentFragment = fragment;
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, fragment);
             transaction.commit();
-            
+
             // Update the toolbar title based on the selected fragment
             if (fragment instanceof HomeFragment) {
                 getSupportActionBar().setTitle(R.string.app_name);
