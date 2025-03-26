@@ -1,6 +1,7 @@
 package com.rel.mujde;
 
 import android.os.Bundle;
+import android.os.Process;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.content.DialogInterface;
@@ -44,27 +45,27 @@ public class ActivityMain extends AppCompatActivity {
 
         if (pref == null) {
             new AlertDialog.Builder(this)
-                    .setMessage(R.string.module_not_enabled)
-                    .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Fully terminate the app process so context is reloaded when LSPosed module is enabled
-                            android.os.Process.killProcess(android.os.Process.myPid());
-                            System.exit(1);
-                        }
-                    })
-                    .setNegativeButton(R.string.continue_anyway, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Continue with limited functionality
-                            pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
-                            initializeFragments();
-                            setupNavigation();
-                            setupBackPressHandling();
-                        }
-                    })
-                    .setCancelable(false)
-                    .show();
+            .setMessage(R.string.module_not_enabled)
+            .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // terminate app's process
+                    Process.killProcess(android.os.Process.myPid());
+                    System.exit(1);
+                }
+            })
+            .setNegativeButton(R.string.continue_anyway, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // continue with limited functionality
+                    pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+                    initializeFragments();
+                    setupNavigation();
+                    setupBackPressHandling();
+                }
+            })
+            .setCancelable(false)
+            .show();
             return;
         }
 
@@ -77,32 +78,33 @@ public class ActivityMain extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                // If we're not on the home fragment, navigate to home first
+                // move to home fragment if not already there
                 if (currentFragment != homeFragment) {
                     bottomNavigationView.setSelectedItemId(R.id.navigation_home);
                     return;
                 }
 
-                // Check if we have unsaved changes in the apps fragment
+                // TODO: wtf???
+                // let the user choose to save changes before exiting
                 if (appsFragment != null && appsFragment.hasUnsavedChanges()) {
                     new AlertDialog.Builder(ActivityMain.this)
-                            .setTitle(R.string.unsaved_changes_title)
-                            .setMessage(R.string.unsaved_changes_message)
-                            .setPositiveButton(R.string.save_and_exit, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Save changes and exit
-                                    finish();
-                                }
-                            })
-                            .setNegativeButton(R.string.discard_and_exit, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    finish();
-                                }
-                            })
-                            .setNeutralButton(R.string.cancel, null)
-                            .show();
+                        .setTitle(R.string.unsaved_changes_title)
+                        .setMessage(R.string.unsaved_changes_message)
+                        .setPositiveButton(R.string.save_and_exit, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Save changes and exit
+                                finish();
+                            }
+                        })
+                        .setNegativeButton(R.string.discard_and_exit, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .setNeutralButton(R.string.cancel, null)
+                        .show();
                 } else {
                     finish();
                 }
@@ -115,7 +117,7 @@ public class ActivityMain extends AppCompatActivity {
         scriptsFragment = new ScriptsFragment();
         appsFragment = new AppsFragment();
 
-        // Initialize with home fragment, but don't select it in the navigation yet
+        // start from home fragment
         loadFragment(homeFragment);
     }
 
@@ -162,6 +164,4 @@ public class ActivityMain extends AppCompatActivity {
             }
         }
     }
-
-
 }
