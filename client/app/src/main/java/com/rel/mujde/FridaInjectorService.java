@@ -6,21 +6,23 @@ import android.os.IBinder;
 import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-
-import static android.content.Context.MODE_WORLD_READABLE;
+import android.content.SharedPreferences;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
+import static android.content.Context.MODE_WORLD_READABLE;
 
 public class FridaInjectorService extends Service {
     private Thread injectorThread = null;
     private SharedPreferences pref = null;
     private boolean shouldContinueLooping = false;
     private Notification serviceNotificaton = null;
+    private ConcurrentLinkedQueue<InjectionRequest> pendingRequests = new ConcurrentLinkedQueue<>();
     final private String CHANNEL_ID = "FrideInjectorChannel";
 
     @Nullable
@@ -47,14 +49,10 @@ public class FridaInjectorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         shouldContinueLooping = true;
-        Log.d("[Mujde]", "service started");
 
-        try {
-            int procId = intent.getIntExtra("proc_id", 0);
-            String packageName = intent.getStringExtra("pkg_name");
-            Log.d("[Mujde]", "Received injection request for " + packageName + " (PID: " + String.valueOf(procId) + ")");
-        } catch (Exception e) {
-            Log.e("[Mujde]", "Error getting intent extras: " + e.getMessage());
+        InjectionRequest request = InjectionRequest.fromExtra(intent);
+        if (request != null) {
+            pendingRequests.add(request);
         }
 
         if (pref == null) {
@@ -105,22 +103,16 @@ public class FridaInjectorService extends Service {
                 final long HALF_SECOND = 500;
                 Thread.sleep(HALF_SECOND);
             } catch (InterruptedException e) {
-                Log.e("[Mujde]", "Error sleeping thread: " + e.getMessage());
+                continue;
+            }
+
+            InjectionRequest request = pendingRequests.poll();
+
+            if (request == null) {
                 continue;
             }
 
             try {
-                // TODO: implement Frida injection logic
-                int pid = pref.getInt("pid_to_hook", 0);
-
-                if (pid == 0) {
-                    // Log.d("[Mujde]", "No PID to hook, skipping injection");
-                    continue;
-                }
-
-                Log.d("[Mujde]", "Injecting to PID: " + pid);
-                pref.edit().putInt("pid_to_hook", 0).apply();
-
                 // TODO: fetch pid from XSharedPreferences, inject scripts, attach to pid
                 ProcessBuilder processBuilder = new ProcessBuilder(
                     // "su", "-c", fridaInjectorPath, "-n", "com.rel.mujde", "-e"
