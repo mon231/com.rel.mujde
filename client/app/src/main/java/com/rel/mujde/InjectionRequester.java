@@ -27,38 +27,11 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class InjectionRequester implements IXposedHookLoadPackage {
-    private XSharedPreferences pref;
-
-    private void log(String message) {
-        XposedBridge.log("[Mujde] " + message);
-    }
-
     private XSharedPreferences getPreferences() {
-        if (pref == null) {
-            pref = new XSharedPreferences(BuildConfig.APPLICATION_ID, Constants.SHARED_PREF_FILE_NAME);
-            pref.reload();
-
-            if (!pref.getFile().canRead()) {
-                log("ERROR: Preference file is not readable!");
-                makeWorldReadable();
-            }
-        } else {
-            pref.reload();
-        }
+        XSharedPreferences pref = new XSharedPreferences(BuildConfig.APPLICATION_ID, Constants.SHARED_PREF_FILE_NAME);
+        pref.reload();
 
         return pref;
-    }
-
-    private void makeWorldReadable() {
-        try {
-            Runtime.getRuntime()
-            .exec("chmod 777 " + pref.getFile().getAbsolutePath())
-            .waitFor();
-
-            pref.reload();
-        } catch (Exception e) {
-            log("Failed to make preferences readable: " + e.getMessage());
-        }
     }
 
     @Override
@@ -72,8 +45,8 @@ public class InjectionRequester implements IXposedHookLoadPackage {
             return;
         }
 
-        XSharedPreferences prefs = getPreferences();
-        List<String> scripts = ScriptUtils.getScriptsForPackage(packageName, prefs);
+        XSharedPreferences pref = getPreferences();
+        List<String> scripts = ScriptUtils.getScriptsForPackage(packageName, pref);
 
         if (scripts == null || scripts.isEmpty()) {
             return;
@@ -82,56 +55,17 @@ public class InjectionRequester implements IXposedHookLoadPackage {
         hookActivityOnCreate(lpparam, scripts);
     }
 
-    // TODO: ensure no scripts are stored in sharedpref, all in dedicatedfolder
+    private void sendInjectionRequest(Activity activity)
+    {
+        Intent intent = new Intent();
+        InjectionRequest request = new InjectionRequest(Process.myPid(), activity.getPackageName());
 
-    // TODO: move this code to service
+        request.putExtra(intent);
+        intent.setComponent(new ComponentName("com.rel.mujde", "com.rel.mujde.InjectionRequestHandler"));
 
-    // private List<String> readScriptContent(String scriptName) {
-    //     List<String> lines = new ArrayList<>();
-
-    //     log("Reading script: " + scriptName);
-
-    //     try {
-    //         // Look for the script in the app's files directory
-    //         File scriptsDir = new File(new File("/data/data/" + BuildConfig.APPLICATION_ID), "files/scripts");
-    //         File scriptFile = new File(scriptsDir, scriptName);
-
-    //         if (scriptFile.exists() && scriptFile.canRead()) {
-    //             try (BufferedReader reader = new BufferedReader(new FileReader(scriptFile))) {
-    //                 String line;
-    //                 while ((line = reader.readLine()) != null) {
-    //                     lines.add(line);
-    //                 }
-    //                 log("Successfully read script: " + scriptName + " with " + lines.size() + " lines");
-    //             }
-    //         } else {
-    //             log("Script file does not exist or is not readable: " + scriptFile.getAbsolutePath());
-
-    //             // Try using XSharedPreferences as a fallback
-    //             XSharedPreferences scriptPref = new XSharedPreferences(BuildConfig.APPLICATION_ID, "script_contents");
-    //             String scriptContent = scriptPref.getString(scriptName, "");
-
-    //             if (!scriptContent.isEmpty()) {
-    //                 String[] lineArray = scriptContent.split("\n");
-    //                 for (String line : lineArray) {
-    //                     lines.add(line);
-    //                 }
-    //                 log("Read " + lines.size() + " lines from XSharedPreferences");
-    //             }
-    //         }
-    //     } catch (Exception e) {
-    //         log("Error reading script: " + e.getMessage());
-    //     }
-
-    //     // Add a fallback message if the script couldn't be read
-    //     if (lines.isEmpty()) {
-    //         lines.add("// Unable to read script: " + scriptName);
-    //         lines.add("// Please place your script in: /data/data/" + BuildConfig.APPLICATION_ID + "/files/scripts/" + scriptName);
-    //         lines.add("// You can use 'adb push your_script.js /data/data/" + BuildConfig.APPLICATION_ID + "/files/scripts/" + scriptName + "'");
-    //     }
-
-    //     return lines;
-    // }
+        XposedBridge.log("[Mujde] sending injection request " + request.toString());
+        activity.sendBroadcast(intent);
+    }
 
     private void hookActivityOnCreate(XC_LoadPackage.LoadPackageParam lpparam, final List<String> scripts) {
         XposedHelpers.findAndHookMethod(
@@ -143,25 +77,13 @@ public class InjectionRequester implements IXposedHookLoadPackage {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     final Activity activity = (Activity)param.thisObject;
-                    final String packageName = activity.getPackageName();
 
-                    // TODO: do we want delay?
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                Intent intent = new Intent();
-                                intent.setComponent(new ComponentName("com.rel.mujde", "com.rel.mujde.InjectionRequestHandler"));
-
-                                intent.putExtra("proc_id", Process.myPid());
-                                intent.putExtra("pkg_name", packageName);
-
-                                activity.sendBroadcast(intent);
-                            } catch (Exception e) {
-                                Log.d("[Mujde]", "Error showing toast: " + e.getMessage());
-                            }
+                            sendInjectionRequest(activity);
                         }
-                    }, 1000); // Delay by 1 second to ensure the activity is fully created
+                    }, 1000); // TODO: do we want Delay by 1 second to ensure the activity is fully created???
                 }
             }
         );
