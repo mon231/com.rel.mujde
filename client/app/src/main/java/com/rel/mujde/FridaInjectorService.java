@@ -6,15 +6,19 @@ import android.os.IBinder;
 import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+
+import static android.content.Context.MODE_WORLD_READABLE;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 public class FridaInjectorService extends Service {
     private Thread injectorThread = null;
+    private SharedPreferences pref = null;
     private boolean shouldContinueLooping = false;
     private Notification serviceNotificaton = null;
     final private String CHANNEL_ID = "FrideInjectorChannel";
@@ -46,6 +50,14 @@ public class FridaInjectorService extends Service {
 
         if (injectorThread != null && injectorThread.isAlive()) {
             return START_STICKY;
+        }
+
+        if (pref == null) {
+            try {
+                pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
+            } catch (Exception e) {
+                Log.e("[Mujde]", "Error creating shared preferences: " + e.getMessage());
+            }
         }
 
         if (serviceNotificaton == null) {
@@ -83,9 +95,27 @@ public class FridaInjectorService extends Service {
     }
 
     private void injectorThreadLogic() {
+        String fridaInjectorPath = getApplicationInfo().nativeLibraryDir + "/libfrida-inject.so";
+
         while (shouldContinueLooping) {
             try {
-                String fridaInjectorPath = getApplicationInfo().nativeLibraryDir + "/libfrida-inject.so";
+                final long HALF_SECOND = 500;
+                Thread.sleep(HALF_SECOND);
+            } catch (InterruptedException e) {
+                Log.e("[Mujde]", "Error sleeping thread: " + e.getMessage());
+                continue;
+            }
+
+            try {
+                int pid = pref.getInt("pid_to_hook", 0);
+
+                if (pid == 0) {
+                    Log.d("[Mujde]", "No PID to hook, skipping injection");
+                    continue;
+                }
+
+                Log.d("[Mujde]", "Injecting to PID: " + pid);
+                pref.edit().putInt("pid_to_hook", 0).apply();
 
                 // TODO: fetch pid from XSharedPreferences, inject scripts, attach to pid
                 ProcessBuilder processBuilder = new ProcessBuilder(
@@ -99,13 +129,6 @@ public class FridaInjectorService extends Service {
                 Log.d("[Mujde]", "Frida injector exited with code: " + exitCode);
             } catch (Exception e) {
                 Log.e("[Mujde]", "Error during frida injection: " + e.getMessage());
-            }
-
-            try {
-                final long HALF_SECOND = 500;
-                Thread.sleep(HALF_SECOND);
-            } catch (InterruptedException e) {
-                Log.e("[Mujde]", "Error sleeping thread: " + e.getMessage());
             }
         }
     }

@@ -39,9 +39,6 @@ import java.util.concurrent.Executors;
 import static android.content.Context.MODE_WORLD_READABLE;
 
 public class AppsFragment extends Fragment implements SearchView.OnQueryTextListener {
-
-
-
     private SharedPreferences pref;
     private RecyclerView appListRecyclerView;
     private SearchView searchView;
@@ -54,9 +51,7 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
     private Executor executor = Executors.newSingleThreadExecutor();
     private boolean hasUnsavedChanges = false;
 
-    public AppsFragment() {
-        // Required empty public constructor
-    }
+    public AppsFragment() {}
 
     @Nullable
     @Override
@@ -125,9 +120,6 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
 
     }
 
-
-
-    
     private void loadAppScriptMappings() {
         appScriptMappings.clear();
         if (pref != null) {
@@ -170,7 +162,7 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
                             @Override
                             public void run() {
                                 if (getActivity() == null) return;
-                                
+
                                 enabledApps.clear();
                                 enabledApps.addAll(enabledAppsList);
 
@@ -207,7 +199,7 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
                             @Override
                             public void run() {
                                 if (getActivity() == null) return;
-                                
+
                                 loadingProgress.setVisibility(View.GONE);
                             }
                         });
@@ -273,19 +265,19 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
         filterApps(newText);
         return true;
     }
-    
+
     public boolean hasUnsavedChanges() {
         return hasUnsavedChanges;
     }
-    
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        
+
         if (requestCode == Constants.REQUEST_CODE_SELECT_SCRIPTS && resultCode == Activity.RESULT_OK && data != null) {
             // Reload the app script mappings from SharedPreferences
             loadAppScriptMappings();
-            
+
             // Update the adapter
             if (appListRecyclerView.getAdapter() != null) {
                 appListRecyclerView.getAdapter().notifyDataSetChanged();

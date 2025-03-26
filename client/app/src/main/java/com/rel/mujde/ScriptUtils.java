@@ -24,7 +24,7 @@ public class ScriptUtils {
     public static void saveAppScriptMappings(SharedPreferences prefs, Map<String, List<String>> appScriptMappings) {
         try {
             JSONObject jsonObject = new JSONObject();
-            
+
             // Only save apps that have selected scripts
             for (Map.Entry<String, List<String>> entry : appScriptMappings.entrySet()) {
                 if (!entry.getValue().isEmpty()) {
@@ -35,7 +35,7 @@ public class ScriptUtils {
                     jsonObject.put(entry.getKey(), scriptsArray);
                 }
             }
-            
+
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(Constants.PREF_APP_SCRIPTS_MAP, jsonObject.toString());
             editor.apply();
@@ -43,7 +43,7 @@ public class ScriptUtils {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Get all app script mappings from SharedPreferences
      * @param prefs SharedPreferences instance
@@ -51,57 +51,30 @@ public class ScriptUtils {
      */
     public static Map<String, List<String>> getAllAppScriptMappings(SharedPreferences prefs) {
         Map<String, List<String>> appScriptMappings = new HashMap<>();
-        
+
         try {
             String jsonString = prefs.getString(Constants.PREF_APP_SCRIPTS_MAP, "{}");
             JSONObject jsonObject = new JSONObject(jsonString);
-            
+
             Iterator<String> keys = jsonObject.keys();
             while (keys.hasNext()) {
                 String packageName = keys.next();
                 JSONArray scriptsArray = jsonObject.getJSONArray(packageName);
-                
+
                 List<String> scripts = new ArrayList<>();
                 for (int i = 0; i < scriptsArray.length(); i++) {
                     scripts.add(scriptsArray.getString(i));
                 }
-                
+
                 appScriptMappings.put(packageName, scripts);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        
+
         return appScriptMappings;
     }
-    
-    /**
-     * Get scripts for a specific app from SharedPreferences
-     * @param prefs SharedPreferences instance
-     * @param packageName Package name of the app
-     * @return List of script names for the app
-     */
-    public static List<String> getScriptsForApp(SharedPreferences prefs, String packageName) {
-        List<String> scripts = new ArrayList<>();
-        
-        try {
-            String jsonString = prefs.getString(Constants.PREF_APP_SCRIPTS_MAP, "{}");
-            JSONObject jsonObject = new JSONObject(jsonString);
-            
-            if (jsonObject.has(packageName)) {
-                JSONArray scriptsArray = jsonObject.getJSONArray(packageName);
-                
-                for (int i = 0; i < scriptsArray.length(); i++) {
-                    scripts.add(scriptsArray.getString(i));
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        
-        return scripts;
-    }
-    
+
     /**
      * Get scripts for a specific package from XSharedPreferences (for Xposed module)
      * @param packageName Package name of the app
@@ -110,14 +83,14 @@ public class ScriptUtils {
      */
     public static List<String> getScriptsForPackage(String packageName, XSharedPreferences prefs) {
         List<String> scripts = new ArrayList<>();
-        
+
         try {
             String jsonString = prefs.getString(Constants.PREF_APP_SCRIPTS_MAP, "{}");
             JSONObject jsonObject = new JSONObject(jsonString);
-            
+
             if (jsonObject.has(packageName)) {
                 JSONArray scriptsArray = jsonObject.getJSONArray(packageName);
-                
+
                 for (int i = 0; i < scriptsArray.length(); i++) {
                     scripts.add(scriptsArray.getString(i));
                 }
@@ -125,7 +98,7 @@ public class ScriptUtils {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        
+
         return scripts;
     }
 }

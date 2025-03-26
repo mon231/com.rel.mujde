@@ -45,7 +45,7 @@ public class ScriptSelectionActivity extends AppCompatActivity {
         // Load the latest script selections from SharedPreferences instead of intent
         SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
         Map<String, List<String>> appScriptMappings = ScriptUtils.getAllAppScriptMappings(prefs);
-        
+
         // Get the current scripts for this package
         List<String> currentScripts = appScriptMappings.get(packageName);
         if (currentScripts != null) {
@@ -92,15 +92,15 @@ public class ScriptSelectionActivity extends AppCompatActivity {
 
                 // Save to SharedPreferences
                 SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
-                
+
                 // Always clear the original mapping and build from scratch
                 Map<String, List<String>> appScriptMappings = new HashMap<>();
-                
+
                 // Add the current selection for this package
                 if (!validScripts.isEmpty()) {
                     appScriptMappings.put(packageName, validScripts);
                 }
-                
+
                 // Save the updated mappings
                 ScriptUtils.saveAppScriptMappings(prefs, appScriptMappings);
 
@@ -123,56 +123,48 @@ public class ScriptSelectionActivity extends AppCompatActivity {
     private List<String> filterValidScripts(List<String> scriptNames) {
         List<String> validScripts = new ArrayList<>();
         File scriptsDir = new File(getFilesDir(), SCRIPTS_DIRECTORY_NAME);
-        
+
         for (String scriptName : scriptNames) {
             File scriptFile = new File(scriptsDir, scriptName);
             if (scriptFile.exists() && scriptFile.isFile()) {
                 validScripts.add(scriptName);
             }
         }
-        
+
         return validScripts;
     }
-    
+
     private void loadAvailableScripts() {
         availableScripts.clear();
-        
+
         // Get scripts directory path
         File internalDir = getFilesDir();
         File scriptsDir = new File(internalDir, SCRIPTS_DIRECTORY_NAME);
-        
+
         // Create the directory if it doesn't exist
         if (!scriptsDir.exists()) {
             scriptsDir.mkdirs();
         }
-        
-        // Set directory permissions to 755 (rwxr-xr-x)
-        try {
-            Process chmod = Runtime.getRuntime().exec("chmod 755 " + scriptsDir.getAbsolutePath());
-            chmod.waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
+
         // Filter out non-existent scripts from selectedScripts
         List<String> validSelectedScripts = filterValidScripts(selectedScripts);
-        
+
         // Update selectedScripts with only valid scripts
         selectedScripts.clear();
         selectedScripts.addAll(validSelectedScripts);
-        
+
         // List all .js files
         if (scriptsDir.exists() && scriptsDir.isDirectory()) {
-            File[] files = scriptsDir.listFiles(file -> 
+            File[] files = scriptsDir.listFiles(file ->
                     file.isFile() && file.getName().endsWith(".js"));
-            
+
             if (files != null && files.length > 0) {
                 for (File file : files) {
                     availableScripts.add(file.getName());
-                    
+
                     // Set file permissions to 644 (rw-r--r--)
                     try {
-                        Process chmod = Runtime.getRuntime().exec("chmod 644 " + file.getAbsolutePath());
+                        Process chmod = Runtime.getRuntime().exec("chmod 777 " + file.getAbsolutePath());
                         chmod.waitFor();
                     } catch (Exception e) {
                         e.printStackTrace();

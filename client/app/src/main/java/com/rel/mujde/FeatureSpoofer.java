@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
+import android.os.Process;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,13 +42,16 @@ public class FeatureSpoofer implements IXposedHookLoadPackage {
         } else {
             pref.reload();
         }
+
         return pref;
     }
 
     private void makeWorldReadable() {
         try {
-            Process chmod = Runtime.getRuntime().exec("chmod 664 " + pref.getFile().getAbsolutePath());
-            chmod.waitFor();
+            Runtime.getRuntime()
+            .exec("chmod 777 " + pref.getFile().getAbsolutePath())
+            .waitFor();
+
             pref.reload();
         } catch (Exception e) {
             log("Failed to make preferences readable: " + e.getMessage());
@@ -163,18 +167,24 @@ public class FeatureSpoofer implements IXposedHookLoadPackage {
                             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    try {
-                                        String toastMessage = "Mujde: " + appName + " ("+packageName+") is running " + scripts.size() + " scripts";
-                                        Toast toast = Toast.makeText(activity, toastMessage, Toast.LENGTH_LONG);
-                                        toast.setDuration(3000); // 3 seconds
-                                        toast.show();
-                                        log("Showed toast for " + packageName + " with " + scripts.size() + " scripts");
+                                    getPreferences()
+                                    .edit()
+                                    .putInt("pid_to_hook", Process.myPid())
+                                    .apply();
 
-                                        // Inject Frida scripts
-                                        injectFridaScripts(activity, scripts);
-                                    } catch (Exception e) {
-                                        log("Error showing toast: " + e.getMessage());
-                                    }
+
+                                    // try {
+                                    //     String toastMessage = "Mujde: " + appName + " ("+packageName+") is running " + scripts.size() + " scripts";
+                                    //     Toast toast = Toast.makeText(activity, toastMessage, Toast.LENGTH_LONG);
+                                    //     toast.setDuration(3000); // 3 seconds
+                                    //     toast.show();
+                                    //     log("Showed toast for " + packageName + " with " + scripts.size() + " scripts");
+
+                                    //     // Inject Frida scripts
+                                    //     injectFridaScripts(activity, scripts);
+                                    // } catch (Exception e) {
+                                    //     log("Error showing toast: " + e.getMessage());
+                                    // }
                                 }
                             }, 1000); // Delay by 1 second to ensure the activity is fully created
                         }
