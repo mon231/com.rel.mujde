@@ -3,6 +3,7 @@ package com.rel.mujde;
 import android.util.Log;
 import android.app.Activity;
 import android.content.Context;
+import android.content.ComponentName;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -133,45 +134,36 @@ public class InjectionRequester implements IXposedHookLoadPackage {
     // }
 
     private void hookActivityOnCreate(XC_LoadPackage.LoadPackageParam lpparam, final List<String> scripts) {
-        try {
-            XposedHelpers.findAndHookMethod(
-                    Activity.class.getName(),
-                    lpparam.classLoader,
-                    "onCreate",
-                    Bundle.class,
-                    new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(
+            Activity.class.getName(),
+            lpparam.classLoader,
+            "onCreate",
+            Bundle.class,
+            new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    final Activity activity = (Activity)param.thisObject;
+                    final String packageName = activity.getPackageName();
+
+                    // TODO: do we want delay?
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
-                            final Activity activity = (Activity)param.thisObject;
-                            final String packageName = activity.getPackageName();
-                            final String appName = activity.getApplicationInfo().loadLabel(activity.getPackageManager()).toString();
+                        public void run() {
+                            try {
+                                Intent intent = new Intent();
+                                intent.setComponent(new ComponentName("com.rel.mujde", "com.rel.mujde.InjectionRequestHandler"));
 
-                            // Show toast on the main thread
-                            // TODO: do we want delay?
-                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        String toastMessage = "Mujde: " + appName + " ("+packageName+") is running " + scripts.size() + " scripts";
-                                        Toast toast = Toast.makeText(activity, toastMessage, Toast.LENGTH_LONG);
-                                        toast.setDuration(3000); // 3 seconds
-                                        toast.show();
-                                        Log.d("[Mujde]", "Showed toast for " + packageName + " with " + scripts.size() + " scripts");
+                                intent.putExtra("proc_id", Process.myPid());
+                                intent.putExtra("pkg_name", packageName);
 
-                                        Intent intent = new Intent("com.rel.mujde.INJECT_REQUEST");
-                                        intent.putExtra("proc_id", Process.myPid());
-                                        intent.putExtra("pkg_name", packageName);
-                                        activity.sendBroadcast(intent);
-                                    } catch (Exception e) {
-                                        Log.d("[Mujde]", "Error showing toast: " + e.getMessage());
-                                    }
-                                }
-                            }, 1000); // Delay by 1 second to ensure the activity is fully created
+                                activity.sendBroadcast(intent);
+                            } catch (Exception e) {
+                                Log.d("[Mujde]", "Error showing toast: " + e.getMessage());
+                            }
                         }
-                    }
-            );
-        } catch (Throwable e) {
-            log("Error hooking Activity.onCreate(): " + e.getMessage());
-        }
+                    }, 1000); // Delay by 1 second to ensure the activity is fully created
+                }
+            }
+        );
     }
 }

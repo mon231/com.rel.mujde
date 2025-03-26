@@ -48,6 +48,12 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name=".InjectionRequestHandler" android:exported="true">
+            <intent-filter>
+                <action android:name="com.rel.mujde.INJECT_REQUEST" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".ScriptSelectionActivity"
             android:exported="false"

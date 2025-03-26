@@ -47,17 +47,18 @@ public class FridaInjectorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         shouldContinueLooping = true;
+        Log.d("[Mujde]", "service started");
 
-        if (injectorThread != null && injectorThread.isAlive()) {
-            return START_STICKY;
+        try {
+            int procId = intent.getIntExtra("proc_id", 0);
+            String packageName = intent.getStringExtra("pkg_name");
+            Log.d("[Mujde]", "Received injection request for " + packageName + " (PID: " + String.valueOf(procId) + ")");
+        } catch (Exception e) {
+            Log.e("[Mujde]", "Error getting intent extras: " + e.getMessage());
         }
 
         if (pref == null) {
-            try {
-                pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
-            } catch (Exception e) {
-                Log.e("[Mujde]", "Error creating shared preferences: " + e.getMessage());
-            }
+            pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
         }
 
         if (serviceNotificaton == null) {
@@ -71,8 +72,10 @@ public class FridaInjectorService extends Service {
             startForeground(SERVICE_ID, serviceNotificaton);
         }
 
-        injectorThread = new Thread(() -> injectorThreadLogic());
-        injectorThread.start();
+        if (injectorThread == null || !injectorThread.isAlive()) {
+            injectorThread = new Thread(() -> injectorThreadLogic());
+            injectorThread.start();
+        }
 
         return START_STICKY;
     }
@@ -107,10 +110,11 @@ public class FridaInjectorService extends Service {
             }
 
             try {
+                // TODO: implement Frida injection logic
                 int pid = pref.getInt("pid_to_hook", 0);
 
                 if (pid == 0) {
-                    Log.d("[Mujde]", "No PID to hook, skipping injection");
+                    // Log.d("[Mujde]", "No PID to hook, skipping injection");
                     continue;
                 }
 

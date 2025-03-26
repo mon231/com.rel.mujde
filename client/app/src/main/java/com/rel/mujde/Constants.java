@@ -5,7 +5,7 @@ public class Constants {
     public static final String PREF_APP_SCRIPTS_MAP = "pref_app_scripts_map";
     public static final String PREF_SCRIPTS_REPOSITORY = "pref_scripts_repository";
     public static final String DEFAULT_REPOSITORY = "127.0.0.1:8080";
-    
+
     // Request codes for activities
     public static final int REQUEST_CODE_SELECT_SCRIPTS = 1002;
 }
