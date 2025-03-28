@@ -112,7 +112,7 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
     }
 
     private void loadAppScriptMappings() {
-        // used in case of partial initialization (where Mujde's module isn't enabled)
+        // NOTE used in case of partial initialization (where Mujde's module isn't enabled)
         if (pref == null) {
             return;
         }
@@ -142,10 +142,10 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
                                 enabledApps.addAll(enabledAppsList);
 
                                 if (!enabledApps.isEmpty()) {
-                                    AppScriptsAdapter adapter = new AppScriptsAdapter(
+                                    AppListAdapter adapter = new AppListAdapter(
                                             getActivity(),
                                             enabledApps,
-                                            new AppScriptsAdapter.OnScriptSelectionChangedListener() {
+                                            new AppListAdapter.OnScriptSelectionChangedListener() {
                                                 @Override
                                                 public void onScriptSelectionChanged(String packageName, List<String> selectedScripts) {
                                                     // Update the app script mappings
@@ -194,7 +194,6 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
             }
         }
 
-        // Sort by app name
         filteredApps.sort((app1, app2) -> {
             String name1 = pm.getApplicationLabel(app1).toString().toLowerCase();
             String name2 = pm.getApplicationLabel(app2).toString().toLowerCase();
@@ -205,8 +204,10 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
     }
 
     private void filterApps(String query) {
-        AppScriptsAdapter adapter = (AppScriptsAdapter) appListRecyclerView.getAdapter();
-        if (adapter == null) return;
+        AppListAdapter adapter = (AppListAdapter)appListRecyclerView.getAdapter();
+        if (adapter == null) {
+            return;
+        }
 
         if (TextUtils.isEmpty(query)) {
             adapter.updateList(enabledApps);

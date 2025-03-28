@@ -17,18 +17,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import java.util.Map;
 
-public class AppScriptsAdapter extends RecyclerView.Adapter<AppScriptsAdapter.ViewHolder> {
+public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHolder> {
     private final Context context;
     private List<ApplicationInfo> appList;
     private final OnScriptSelectionChangedListener onScriptSelectionChangedListener;
 
-    public AppScriptsAdapter(
+    public AppListAdapter(
         Context context,
         List<ApplicationInfo> appList,
         OnScriptSelectionChangedListener onScriptSelectionChangedListener) {
         this.context = context;
         this.appList = appList;
-
         this.onScriptSelectionChangedListener = onScriptSelectionChangedListener;
     }
 

@@ -10,7 +10,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
-public interface ScriptService {
+public interface ScriptServer {
     @GET("scripts")
     Call<List<Script>> getAllScripts();
 

@@ -12,7 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.rel.mujde.api.ApiClient;
-import com.rel.mujde.api.ScriptService;
+import com.rel.mujde.api.ScriptServer;
 import com.rel.mujde.api.model.Script;
 
 import java.io.File;
@@ -36,42 +36,32 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
     private ProgressBar progressBar;
     private List<Script> remoteScriptsList = new ArrayList<>();
     private RemoteScriptAdapter remoteScriptsAdapter;
-    private ScriptService scriptService;
+    private ScriptServer scriptServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remote_scripts);
 
-        // Set title
         setTitle("Remote Scripts Repository");
+        scriptServer = ApiClient.getClient(this);
 
-        // Initialize views
         listViewRemoteScripts = findViewById(R.id.list_remote_scripts);
         emptyTextView = findViewById(R.id.text_empty_remote_scripts);
         progressBar = findViewById(R.id.progress_bar);
 
-        scriptService = ApiClient.getClient(this).create(ScriptService.class);
-
-        // Initialize adapter with this activity as the listener
         remoteScriptsAdapter = new RemoteScriptAdapter(this, remoteScriptsList, this);
         listViewRemoteScripts.setAdapter(remoteScriptsAdapter);
 
-        // Load remote scripts
         loadRemoteScripts();
     }
 
     private void loadRemoteScripts() {
-        // Show progress bar
         progressBar.setVisibility(View.VISIBLE);
         emptyTextView.setVisibility(View.GONE);
         listViewRemoteScripts.setVisibility(View.GONE);
 
-        // Get API service
-        ScriptService scriptService = ApiClient.getClient(this).create(ScriptService.class);
-
-        // Make API call to get all scripts
-        scriptService.getAllScripts().enqueue(new Callback<List<Script>>() {
+        scriptServer.getAllScripts().enqueue(new Callback<List<Script>>() {
             @Override
             public void onResponse(Call<List<Script>> call, Response<List<Script>> response) {
                 progressBar.setVisibility(View.GONE);
@@ -116,58 +106,52 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
 
     @Override
     public void onDeleteScript(Script script) {
-        // Show confirmation dialog
         new AlertDialog.Builder(this)
-                .setTitle("Delete Remote Script")
-                .setMessage("Are you sure you want to delete " + script.getScriptName() + " from the server?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    // Show progress
-                    progressBar.setVisibility(View.VISIBLE);
+            .setTitle("Delete Remote Script")
+            .setMessage("Are you sure you want to delete " + script.getScriptName() + " from the server?")
+            .setPositiveButton("Delete", (dialog, which) -> {
+                progressBar.setVisibility(View.VISIBLE);
 
-                    // Call API to delete the script
-                    scriptService.deleteScript(script.getScriptId()).enqueue(new Callback<Void>() {
-                        @Override
-                        public void onResponse(Call<Void> call, Response<Void> response) {
-                            progressBar.setVisibility(View.GONE);
+                scriptServer.deleteScript(script.getScriptId()).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        progressBar.setVisibility(View.GONE);
 
-                            if (response.isSuccessful()) {
-                                Toast.makeText(RemoteScriptsActivity.this,
-                                        "Script deleted successfully", Toast.LENGTH_SHORT).show();
-                                // Refresh the list
-                                loadRemoteScripts();
-                            } else {
-                                showErrorDialog("Failed to delete script: " + response.code());
-                            }
+                        if (response.isSuccessful()) {
+                            Toast.makeText(RemoteScriptsActivity.this,
+                                "Script deleted successfully", Toast.LENGTH_SHORT).show();
+                            loadRemoteScripts();
+                        } else {
+                            showErrorDialog("Failed to delete script: " + response.code());
                         }
+                    }
 
-                        @Override
-                        public void onFailure(Call<Void> call, Throwable t) {
-                            progressBar.setVisibility(View.GONE);
-                            showErrorDialog("Network error: " + t.getMessage());
-                        }
-                    });
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        progressBar.setVisibility(View.GONE);
+                        showErrorDialog("Network error: " + t.getMessage());
+                    }
+                });
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
     }
 
     @Override
     public void onDownloadScript(Script script) {
-        // First, check if we already have the content
         if (script.getContent() == null || script.getContent().isEmpty()) {
-            // We need to fetch the content first
             progressBar.setVisibility(View.VISIBLE);
 
-            scriptService.getScriptById(script.getScriptId()).enqueue(new Callback<Script>() {
+            scriptServer.getScriptById(script.getScriptId()).enqueue(new Callback<Script>() {
                 @Override
                 public void onResponse(Call<Script> call, Response<Script> response) {
                     progressBar.setVisibility(View.GONE);
 
                     if (response.isSuccessful() && response.body() != null) {
                         Script fullScript = response.body();
+
                         if (fullScript.getContent() != null && !fullScript.getContent().isEmpty()) {
-                            // Now we have the content, check for conflicts and save
-                            checkForConflictAndSave(fullScript);
+                            saveScriptFile(fullScript);
                         } else {
                             Toast.makeText(RemoteScriptsActivity.this,
                                     "Script content is empty", Toast.LENGTH_SHORT).show();
@@ -184,32 +168,30 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
                 }
             });
         } else {
-            // We already have the content, check for conflicts and save
-            checkForConflictAndSave(script);
+            saveScriptFile(script);
         }
     }
 
-    private void checkForConflictAndSave(Script script) {
+    private void saveScriptFile(Script script) {
         String scriptName = ScriptUtils.adjustScriptFileName(script.getScriptName());
         File localScriptFile = ScriptUtils.getScriptFile((Context)this, scriptName);
 
         if (!localScriptFile.exists()) {
-            saveScriptLocally(script);
+            saveScriptIgnoreConflicts(script);
             return;
         }
 
-        // There's a conflict, we need to compare timestamps and ask the user
+        // NOTE there's a conflict between local and remote scripts, prompt user to choose
+
         long remoteLastModified = 0;
         long localLastModified = localScriptFile.lastModified();
 
-        // Parse the remote timestamp
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.US);
             Date remoteDate = sdf.parse(script.getLastModified());
             remoteLastModified = remoteDate.getTime();
         } catch (ParseException e) {
             e.printStackTrace();
-            // TODO: toast? return?
         }
 
         String newerVersion = (remoteLastModified > localLastModified) ? "remote" : "local";
@@ -218,15 +200,13 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
             .setMessage("A script with the name " + scriptName + " already exists locally. " +
                     "The " + newerVersion + " version is newer. Do you want to override the local script?")
             .setPositiveButton("Override", (dialog, which) -> {
-                saveScriptLocally(script);
+                saveScriptIgnoreConflicts(script);
             })
             .setNegativeButton("Cancel", null)
             .show();
     }
 
-    private void saveScriptLocally(Script script) {
-        // TODO: cleanup whole file
-
+    private void saveScriptIgnoreConflicts(Script script) {
         String scriptName = ScriptUtils.adjustScriptFileName(script.getScriptName());
         File scriptFile = ScriptUtils.getScriptFile((Context)this, scriptName);
 
