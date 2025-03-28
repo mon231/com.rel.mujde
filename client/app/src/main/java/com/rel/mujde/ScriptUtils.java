@@ -78,7 +78,8 @@ public class ScriptUtils {
     }
 
     public static File[] getScripts(Context context) {
-        return getScriptsDirectory(context).listFiles(file -> file.isFile() && file.getName().endsWith(".js"));
+        return getScriptsDirectory(context).listFiles(file ->
+            file.isFile() && file.getName().endsWith(Constants.SCRIPT_FILE_EXTENSION));
     }
 
     public static File getScriptsDirectory(Context context) {
@@ -97,6 +98,14 @@ public class ScriptUtils {
 
     public static String getScriptsDirectoryPath(Context context) {
         return getScriptsDirectory(context).getAbsolutePath();
+    }
+
+    public static String adjustScriptFileName(String scriptName) {
+        if (scriptName.endsWith(Constants.SCRIPT_FILE_EXTENSION)) {
+            return scriptName;
+        }
+
+        return scriptName + Constants.SCRIPT_FILE_EXTENSION;
     }
 
     /**

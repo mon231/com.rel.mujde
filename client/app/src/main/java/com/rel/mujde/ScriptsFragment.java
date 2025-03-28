@@ -138,9 +138,7 @@ public class ScriptsFragment extends Fragment {
             e.printStackTrace();
         }
 
-        // List all .js files
         File[] files = ScriptUtils.getScripts(requireContext());
-
         if (files != null && files.length > 0) {
             for (File file : files) {
                 scriptsList.add(file.getName());
@@ -154,7 +152,6 @@ public class ScriptsFragment extends Fragment {
                 }
             }
 
-            // TOOD: ???????????
             emptyTextView.setVisibility(View.GONE);
             listViewScripts.setVisibility(View.VISIBLE);
         } else {
@@ -162,7 +159,6 @@ public class ScriptsFragment extends Fragment {
             listViewScripts.setVisibility(View.GONE);
         }
 
-        // Notify the adapter that the data has changed
         scriptsAdapter.notifyDataSetChanged();
     }
 
@@ -186,17 +182,11 @@ public class ScriptsFragment extends Fragment {
                 return;
             }
 
-            // Add .js extension if not present
-            if (!fileName.endsWith(".js")) {
-                fileName += ".js";
-            }
-
-            // Create the new script file
+            fileName = ScriptUtils.adjustScriptFileName(fileName);
             createNewScript(fileName);
         });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
         builder.show();
     }
 

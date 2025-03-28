@@ -192,13 +192,7 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
     }
 
     private void checkForConflictAndSave(Script script) {
-        String scriptName = script.getScriptName();
-        if (!scriptName.endsWith(".js")) {
-            // TODO: use Constants.SCRIPT_EXTENSION
-            scriptName = scriptName + ".js";
-        }
-
-        // TODO: have util to ScriptUtils get script file
+        String scriptName = ScriptUtils.adjustScriptFileName(script.getScriptName());
         File localScriptFile = ScriptUtils.getScriptFile((Context)this, scriptName);
 
         if (!localScriptFile.exists()) {
@@ -237,14 +231,8 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
 
     private void saveScriptLocally(Script script) {
         // TODO: cleanup whole file
-        // Create scripts directory if it doesn't exist
-        // Ensure the script name ends with .js extension
-        String scriptName = script.getScriptName();
-        if (!scriptName.endsWith(".js")) {
-            scriptName = scriptName + ".js";
-        }
 
-        // Save the script content to a file
+        String scriptName = ScriptUtils.adjustScriptFileName(script.getScriptName());
         File scriptFile = ScriptUtils.getScriptFile((Context)this, scriptName);
 
         try (FileWriter writer = new FileWriter(scriptFile)) {
