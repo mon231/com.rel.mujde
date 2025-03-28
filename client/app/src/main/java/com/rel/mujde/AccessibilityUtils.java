@@ -5,9 +5,7 @@ public class AccessibilityUtils {
     public static void makeFileWorldReadable(File file) {
         try {
             final String MODE_RW_R_R = "644";
-            Runtime.getRuntime()
-            .exec("chmod " + MODE_RW_R_R + " " + file.getAbsolutePath())
-            .waitFor();
+            new ProcessBuilder("chmod", MODE_RW_R_R, file.getAbsolutePath()).start().wait();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -16,9 +14,7 @@ public class AccessibilityUtils {
     public static void makeDirWorldReadable(File dir) {
         try {
             final String MODE_RW_R_R = "755";
-            Runtime.getRuntime()
-            .exec("chmod " + MODE_RW_R_R + " " + dir.getAbsolutePath())
-            .waitFor();
+            new ProcessBuilder("chmod", MODE_RW_R_R, dir.getAbsolutePath()).start().wait();
         } catch (Exception e) {
             e.printStackTrace();
         }
