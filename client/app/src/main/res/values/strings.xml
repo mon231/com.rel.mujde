@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
+    <string name="app_name">Mujde</string>
+    <string name="module_not_enabled">Mujde Xposed module is not enabled. App features will be extremly limited and error-prone. Please enable the module in LSPosed/EdXposed Manager and reopen the app.</string>
+    <string name="close">Close</string>
+    <string name="continue_anyway">Continue Anyway</string>
+    <string name="search_apps">Search apps…</string>
+    <string name="no_apps_found">No apps found. Try a different search query.</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="settings_saved">Settings saved successfully</string>
+    <string name="error_saving_settings">Error saving settings</string>
+    <string name="error_loading_apps">Error loading applications. Please try again.</string>
+    <string name="app_icon">App icon</string>
+
+    <string name="unsaved_changes_title">Unsaved Changes</string>
+    <string name="unsaved_changes_message">You have unsaved changes. What would you like to do?</string>
+    <string name="save_and_exit">Save and Exit</string>
+    <string name="discard_and_exit">Discard and Exit</string>
+    <string name="cancel">Cancel</string>
+    <string-array name="module_scope">
+        <item>com.linkedin.android</item>
+        <item>com.instagram.android</item>
+    </string-array>
+
+    <!-- Navigation -->
+    <string name="title_home">Home</string>
+    <string name="title_scripts">Repository</string>
+    <string name="title_apps">Apps</string>
+
+    <string name="select">Select</string>
+    <string name="save">Save</string>
+
+    <!-- Script Selection -->
+    <string name="script_count">%1$d scripts selected</string>
+    <string name="no_scripts_selected">No scripts selected</string>
+    <string name="select_scripts_for_app">Select Scripts for this App</string>
+</resources>

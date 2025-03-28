@@ -1,9 +1,13 @@
 name: Build Mujde apk for LSPosed
-on: push
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v1
@@ -14,10 +18,11 @@ jobs:
           java-version: '21'
 
       - name: Build APK
+        working-directory: ./client
         run: bash ./gradlew build
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: mujde-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: client/app/build/outputs/apk/debug/app-debug.apk
