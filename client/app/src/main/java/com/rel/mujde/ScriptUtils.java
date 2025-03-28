@@ -79,7 +79,7 @@ public class ScriptUtils {
 
     public static File[] getScripts(Context context) {
         return getScriptsDirectory(context).listFiles(file ->
-            file.isFile() && file.getName().endsWith(Constants.SCRIPT_FILE_EXTENSION));
+            file.isFile() && file.getName().endsWith(Constants.SCRIPT_FILE_EXT));
     }
 
     public static File getScriptsDirectory(Context context) {
@@ -101,11 +101,11 @@ public class ScriptUtils {
     }
 
     public static String adjustScriptFileName(String scriptName) {
-        if (scriptName.endsWith(Constants.SCRIPT_FILE_EXTENSION)) {
+        if (scriptName.endsWith(Constants.SCRIPT_FILE_EXT)) {
             return scriptName;
         }
 
-        return scriptName + Constants.SCRIPT_FILE_EXTENSION;
+        return scriptName + Constants.SCRIPT_FILE_EXT;
     }
 
     /**
