@@ -112,7 +112,7 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
     }
 
     private void loadAppScriptMappings() {
-        // TODO: should we nullcheck pref member? should it be a member?
+        // used in case of partial initialization (where Mujde's module isn't enabled)
         if (pref == null) {
             return;
         }
