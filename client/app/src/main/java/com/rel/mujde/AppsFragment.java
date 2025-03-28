@@ -145,8 +145,6 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
                                     AppScriptsAdapter adapter = new AppScriptsAdapter(
                                             getActivity(),
                                             enabledApps,
-
-                                            appScriptMappings,
                                             new AppScriptsAdapter.OnScriptSelectionChangedListener() {
                                                 @Override
                                                 public void onScriptSelectionChanged(String packageName, List<String> selectedScripts) {

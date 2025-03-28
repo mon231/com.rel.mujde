@@ -22,37 +22,34 @@ import java.util.List;
 import java.util.Map;
 
 public class ScriptSelectionActivity extends AppCompatActivity {
-    public static final String EXTRA_PACKAGE_NAME = "extra_package_name";
-
     private String packageName;
-    private List<String> selectedScripts = new ArrayList<>();
-    private List<String> availableScripts = new ArrayList<>();
     private ScriptCheckboxAdapter adapter;
+
+    // NOTE these must be final as the adapter uses their reference
+    private final List<String> selectedScripts = new ArrayList<>();
+    private final List<String> availableScripts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_script_selection);
 
-        // Get the package name from the intent
-        packageName = getIntent().getStringExtra(EXTRA_PACKAGE_NAME);
-        if (packageName == null) {
+        TextView appNameText = findViewById(R.id.app_name_text);
+        RecyclerView scriptsRecyclerView = findViewById(R.id.scripts_recycler_view);
+
+        packageName = getIntent().getStringExtra(Constants.INTENT_REQUEST_PACKAGE_NAME);
+        if (packageName == null || packageName.isEmpty()) {
             finish();
             return;
         }
 
-        // Load the latest script selections from SharedPreferences instead of intent
         SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
-        Map<String, List<String>> appScriptMappings = ScriptUtils.getAllAppScriptMappings(prefs);
+        List<String> currentScripts = ScriptUtils.getAllAppScriptMappings(prefs).get(packageName);
 
-        // Get the current scripts for this package
-        List<String> currentScripts = appScriptMappings.get(packageName);
         if (currentScripts != null) {
             selectedScripts.addAll(currentScripts);
         }
 
-        // Set up the app name
-        TextView appNameText = findViewById(R.id.app_name_text);
         try {
             PackageManager packageManager = getPackageManager();
             ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
@@ -61,18 +58,12 @@ public class ScriptSelectionActivity extends AppCompatActivity {
             appNameText.setText(packageName);
         }
 
-        // Load available scripts
         loadAvailableScripts();
-
-        // Set up the RecyclerView
-        RecyclerView scriptsRecyclerView = findViewById(R.id.scripts_recycler_view);
         scriptsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Create and set the adapter
         adapter = new ScriptCheckboxAdapter(availableScripts, selectedScripts);
         scriptsRecyclerView.setAdapter(adapter);
 
-        // Set up the buttons
         Button cancelButton = findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,37 +77,16 @@ public class ScriptSelectionActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get the selected scripts from the adapter and filter out non-existent scripts
                 List<String> validScripts = filterValidScripts(adapter.getSelectedScripts());
-
-                // Save to SharedPreferences
                 SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
+                ScriptUtils.saveAppScriptMappings(prefs, packageName, validScripts);
 
-                // Always clear the original mapping and build from scratch
-                Map<String, List<String>> appScriptMappings = new HashMap<>();
-
-                // Add the current selection for this package
-                if (!validScripts.isEmpty()) {
-                    appScriptMappings.put(packageName, validScripts);
-                }
-
-                // Save the updated mappings
-                ScriptUtils.saveAppScriptMappings(prefs, appScriptMappings);
-
-                // Create the result intent
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra(EXTRA_PACKAGE_NAME, packageName);
-
-                // Set the result and finish
-                setResult(Activity.RESULT_OK, resultIntent);
+                setResult(Activity.RESULT_OK);
                 finish();
             }
         });
     }
 
-    /**
-     * get a reduced list where all script-files are ensured to exist and be valid
-     */
     private List<String> filterValidScripts(List<String> scriptNames) {
         List<String> validScripts = new ArrayList<>();
 
@@ -134,7 +104,6 @@ public class ScriptSelectionActivity extends AppCompatActivity {
         availableScripts.clear();
         List<String> validSelectedScripts = filterValidScripts(selectedScripts);
 
-        // Update selectedScripts with only valid scripts
         selectedScripts.clear();
         selectedScripts.addAll(validSelectedScripts);
 

@@ -35,12 +35,10 @@ public class ScriptCheckboxAdapter extends RecyclerView.Adapter<ScriptCheckboxAd
         holder.scriptCheckbox.setChecked(selectedScripts.contains(scriptName));
 
         holder.scriptCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                if (!selectedScripts.contains(scriptName)) {
-                    selectedScripts.add(scriptName);
-                }
-            } else {
+            if (!isChecked) {
                 selectedScripts.remove(scriptName);
+            } else if (!selectedScripts.contains(scriptName)) {
+                selectedScripts.add(scriptName);
             }
         });
     }

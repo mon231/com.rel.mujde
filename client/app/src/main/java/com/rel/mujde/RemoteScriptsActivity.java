@@ -212,10 +212,7 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
             // TODO: toast? return?
         }
 
-        // Determine which is newer
         String newerVersion = (remoteLastModified > localLastModified) ? "remote" : "local";
-
-        // Show conflict resolution dialog
         new AlertDialog.Builder(this)
             .setTitle("Script Already Exists")
             .setMessage("A script with the name " + scriptName + " already exists locally. " +

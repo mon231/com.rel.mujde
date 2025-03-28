@@ -20,18 +20,15 @@ import java.util.Map;
 public class AppScriptsAdapter extends RecyclerView.Adapter<AppScriptsAdapter.ViewHolder> {
     private final Context context;
     private List<ApplicationInfo> appList;
-    private final Map<String, List<String>> appScriptMappings;
     private final OnScriptSelectionChangedListener onScriptSelectionChangedListener;
 
     public AppScriptsAdapter(
         Context context,
         List<ApplicationInfo> appList,
-        Map<String, List<String>> appScriptMappings,
         OnScriptSelectionChangedListener onScriptSelectionChangedListener) {
         this.context = context;
         this.appList = appList;
 
-        this.appScriptMappings = appScriptMappings;
         this.onScriptSelectionChangedListener = onScriptSelectionChangedListener;
     }
 
@@ -78,7 +75,7 @@ public class AppScriptsAdapter extends RecyclerView.Adapter<AppScriptsAdapter.Vi
                 }
 
                 Intent intent = new Intent(context, ScriptSelectionActivity.class);
-                intent.putExtra(ScriptSelectionActivity.EXTRA_PACKAGE_NAME, app.packageName);
+                intent.putExtra(Constants.INTENT_REQUEST_PACKAGE_NAME, app.packageName);
 
                 ((Activity)context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_SCRIPTS);
             }

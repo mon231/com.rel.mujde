@@ -11,9 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.rel.mujde.api.model.Script;
-
 import java.util.List;
+import com.rel.mujde.api.model.Script;
 
 public class RemoteScriptAdapter extends ArrayAdapter<Script> {
     private final Context context;

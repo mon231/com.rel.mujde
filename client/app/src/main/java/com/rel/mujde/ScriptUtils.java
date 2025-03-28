@@ -16,21 +16,19 @@ import java.util.List;
 import java.util.Map;
 
 public class ScriptUtils {
-    public static void saveAppScriptMappings(SharedPreferences prefs, Map<String, List<String>> appScriptMappings) {
+    public static void saveAppScriptMappings(SharedPreferences prefs, String packageName, List<String> scripts) {
         try {
-            JSONObject jsonObject = new JSONObject();
+            String jsonString = prefs.getString(Constants.PREF_APP_SCRIPTS_MAP, "{}");
+            JSONObject jsonObject = new JSONObject(jsonString);
+            jsonObject.remove(packageName);
 
-            for (Map.Entry<String, List<String>> entry : appScriptMappings.entrySet()) {
-                if (entry.getValue().isEmpty()) {
-                    continue;
-                }
+            JSONArray scriptsArray = new JSONArray();
+            for (String script : scripts) {
+                scriptsArray.put(script);
+            }
 
-                JSONArray scriptsArray = new JSONArray();
-                for (String script : entry.getValue()) {
-                    scriptsArray.put(script);
-                }
-
-                jsonObject.put(entry.getKey(), scriptsArray);
+            if (!scripts.isEmpty()) {
+                jsonObject.put(packageName, scriptsArray);
             }
 
             SharedPreferences.Editor editor = prefs.edit();

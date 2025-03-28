@@ -9,5 +9,6 @@ public class Constants {
     public static final String SCRIPT_FILE_EXT = ".js";
 
     // Request codes for activities
+    public static final String INTENT_REQUEST_PACKAGE_NAME = "package_name";
     public static final int REQUEST_CODE_SELECT_SCRIPTS = 1002;
 }
