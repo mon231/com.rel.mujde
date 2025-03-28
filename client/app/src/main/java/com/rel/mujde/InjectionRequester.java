@@ -43,7 +43,7 @@ public class InjectionRequester implements IXposedHookLoadPackage {
             return;
         }
 
-        hookActivityOnCreate(lpparam);
+        installHookOnActivityCreation(lpparam);
     }
 
     private void sendInjectionRequest(Activity activity)

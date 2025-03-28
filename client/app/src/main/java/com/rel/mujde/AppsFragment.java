@@ -156,6 +156,7 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
                                                     } else {
                                                         appScriptMappings.put(packageName, new ArrayList<>(selectedScripts));
                                                     }
+
                                                     hasUnsavedChanges = true;
                                                 }
                                             }

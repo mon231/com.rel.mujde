@@ -34,6 +34,7 @@ public class ScriptsFragment extends Fragment {
     private ListView listViewScripts;
     private TextView emptyTextView;
     private FloatingActionButton fabAddScript;
+    private FloatingActionButton fabCloud;
     private List<String> scriptsList = new ArrayList<>();
     private ArrayAdapter<String> scriptsAdapter;
 
@@ -47,6 +48,7 @@ public class ScriptsFragment extends Fragment {
         listViewScripts = view.findViewById(R.id.list_scripts);
         emptyTextView = view.findViewById(R.id.text_empty_scripts);
         fabAddScript = view.findViewById(R.id.fab_add_script);
+        fabCloud = view.findViewById(R.id.fab_cloud);
 
         // setup callbacks for app-item buttons
         scriptsAdapter = new ScriptAdapter(requireContext(), scriptsList, new ScriptAdapter.ScriptActionListener() {
@@ -68,24 +70,15 @@ public class ScriptsFragment extends Fragment {
         return view;
     }
 
-    // TODO: cleanups
     private void setupListeners(View view) {
-        // FAB click listener to add a new script
-        fabAddScript.setOnClickListener(v -> showAddScriptDialog());
+        fabAddScript.setOnClickListener(e -> showAddScriptDialog());
 
-        // Cloud FAB click listener to open remote scripts activity
-        FloatingActionButton fabCloud = view.findViewById(R.id.fab_cloud);
         fabCloud.setOnClickListener(v -> {
-            // Check if repository is configured
-            SharedPreferences prefs = requireContext().getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
-            String repository = prefs.getString(Constants.PREF_SCRIPTS_REPOSITORY, null);
-
-            if (repository == null || repository.isEmpty()) {
+            if (!ScriptUtils.hasSetRepositoryAddress(requireContext())) {
                 Toast.makeText(requireContext(), "Please configure repository URL in Home tab first", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            // Open remote scripts activity
             Intent intent = new Intent(requireContext(), RemoteScriptsActivity.class);
             startActivity(intent);
         });
@@ -162,15 +155,15 @@ public class ScriptsFragment extends Fragment {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(scriptFile))) {
                 writer.write(templateContent);
             }
-
-            AccessibilityUtils.makeFileWorldReadable(scriptFile);
-            Toast.makeText(requireContext(), "Script created successfully", Toast.LENGTH_SHORT).show();
-
-            loadScripts();
-            openScriptEditor(fileName);
         } catch (IOException e) {
             Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+
+        AccessibilityUtils.makeFileWorldReadable(scriptFile);
+        Toast.makeText(requireContext(), "Script created successfully", Toast.LENGTH_SHORT).show();
+
+        loadScripts();
+        openScriptEditor(fileName);
     }
 
     private void openScriptEditor(String scriptName) {
@@ -181,7 +174,6 @@ public class ScriptsFragment extends Fragment {
             return;
         }
 
-        // Read the script content
         StringBuilder content = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(scriptFile))) {
             String line;
@@ -193,15 +185,13 @@ public class ScriptsFragment extends Fragment {
             return;
         }
 
-        // Create a dialog with an EditText to edit the script
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Edit Script: " + scriptName);
 
-        // Set up the input field
         final EditText input = new EditText(requireContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        input.setText(content.toString());
         input.setTextDirection(View.TEXT_DIRECTION_LTR);
+        input.setText(content.toString());
         input.setMinLines(10);
         input.setMaxLines(20);
         builder.setView(input);
@@ -212,9 +202,7 @@ public class ScriptsFragment extends Fragment {
         });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        builder.create().show();
     }
 
     private void saveScript(String scriptName, String content) {
@@ -222,12 +210,13 @@ public class ScriptsFragment extends Fragment {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(scriptFile))) {
             writer.write(content);
-
-            AccessibilityUtils.makeFileWorldReadable(scriptFile);
-            Toast.makeText(requireContext(), "Script saved successfully", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Toast.makeText(requireContext(), "Error saving script: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        AccessibilityUtils.makeFileWorldReadable(scriptFile);
+        Toast.makeText(requireContext(), "Script saved successfully", Toast.LENGTH_SHORT).show();
     }
 
     private void showDeleteScriptDialog(String scriptName) {
@@ -245,7 +234,7 @@ public class ScriptsFragment extends Fragment {
         if (scriptFile.exists()) {
             if (scriptFile.delete()) {
                 Toast.makeText(requireContext(), "Script deleted", Toast.LENGTH_SHORT).show();
-                loadScripts(); // Refresh the list
+                loadScripts();
             } else {
                 Toast.makeText(requireContext(), "Failed to delete script", Toast.LENGTH_SHORT).show();
             }
