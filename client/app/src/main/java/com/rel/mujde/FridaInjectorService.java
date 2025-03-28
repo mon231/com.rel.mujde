@@ -92,15 +92,16 @@ public class FridaInjectorService extends Service {
             try {
                 injectorThread.interrupt();
                 injectorThread.wait();
-
-                injectorThread = null;
-                serviceNotificaton = null;
             } catch (Exception e) {
                 Log.e("[Mujde]", "Error waiting for thread: " + e.getMessage());
             }
         }
+
+        injectorThread = null;
+        serviceNotificaton = null;
     }
 
+    @Nullable
     private InjectionRequest fetchRequest()
     {
         try {
@@ -112,7 +113,7 @@ public class FridaInjectorService extends Service {
     }
 
     private void injectorThreadLogic() {
-        String fridaInjectorPath = getApplicationInfo().nativeLibraryDir + "/libfrida-inject.so";
+        final String INJECTOR_PATH = getApplicationInfo().nativeLibraryDir + "/libfrida-inject.so";
 
         while (shouldContinueLooping) {
             InjectionRequest request = fetchRequest();
@@ -123,12 +124,14 @@ public class FridaInjectorService extends Service {
 
             ScriptUtils.getScriptsForPackage(request.getPackageName(), pref).forEach(script -> {
                 Log.d("[Mujde]", "about to frida-inject " + script + " into " + request.toString());
-                String scriptFullPath = getApplicationContext().getFilesDir().getAbsolutePath() + "/scripts/" + script;
+
+                // TODO: should we add that "/"?, use new Utils
+                String scriptFullPath = ScriptUtils.getScriptsDirectoryPath(getApplicationContext()) + "/" + script;
 
                 try {
                     ProcessBuilder processBuilder = new ProcessBuilder(
                         "su", "-c",
-                        fridaInjectorPath, "-e",
+                        INJECTOR_PATH, "-e",
                         "-p", String.valueOf(request.getPid()),
                         "-s", scriptFullPath
                     );

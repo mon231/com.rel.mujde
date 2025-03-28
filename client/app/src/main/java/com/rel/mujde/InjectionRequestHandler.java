@@ -8,16 +8,16 @@ import android.content.BroadcastReceiver;
 public class InjectionRequestHandler extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        int procId = intent.getIntExtra("proc_id", 0);
-        String packageName = intent.getStringExtra("pkg_name");
+        InjectionRequest request = InjectionRequest.fromExtra(intent);
 
-        if (procId == 0 || packageName == null || packageName.isEmpty()) {
+        if (request == null) {
             return;
         }
 
+        Log.d("[Mujde]", "Received injection request" + request.toString());
         Intent serviceIntent = new Intent(context, FridaInjectorService.class);
-        serviceIntent.putExtra("proc_id", procId);
-        serviceIntent.putExtra("pkg_name", packageName);
+
+        request.putExtra(serviceIntent);
         context.startService(serviceIntent);
     }
 }

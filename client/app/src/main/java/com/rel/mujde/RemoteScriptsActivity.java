@@ -37,8 +37,6 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
     private List<Script> remoteScriptsList = new ArrayList<>();
     private RemoteScriptAdapter remoteScriptsAdapter;
     private ScriptService scriptService;
-    private static final String SCRIPTS_DIRECTORY_NAME = "scripts";
-    private String scriptsDirectoryPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +52,8 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
         progressBar = findViewById(R.id.progress_bar);
 
         // Initialize API service
+        // TODO: ScriptService ???
         scriptService = ApiClient.getClient(this).create(ScriptService.class);
-
-        // Initialize scripts directory path
-        File internalDir = getFilesDir();
-        File scriptsDir = new File(internalDir, SCRIPTS_DIRECTORY_NAME);
-        scriptsDirectoryPath = scriptsDir.getAbsolutePath();
 
         // Initialize adapter with this activity as the listener
         remoteScriptsAdapter = new RemoteScriptAdapter(this, remoteScriptsList, this);
@@ -205,7 +199,8 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
         }
 
         // Check if a local script with the same name exists
-        File localScriptFile = new File(scriptsDirectoryPath, scriptName);
+        // TODO: have util to ScriptUtils get script file
+        File localScriptFile = new File(ScriptUtils.getScriptsDirectory(this), scriptName);
 
         if (localScriptFile.exists()) {
             // There's a conflict, we need to compare timestamps and ask the user
@@ -245,15 +240,8 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
     }
 
     private void saveScriptLocally(Script script) {
+        // TODO: cleanup whole file
         // Create scripts directory if it doesn't exist
-        File scriptsDir = new File(scriptsDirectoryPath);
-        if (!scriptsDir.exists()) {
-            if (!scriptsDir.mkdirs()) {
-                Toast.makeText(this, "Failed to create scripts directory", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
         // Ensure the script name ends with .js extension
         String scriptName = script.getScriptName();
         if (!scriptName.endsWith(".js")) {
@@ -261,7 +249,7 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
         }
 
         // Save the script content to a file
-        File scriptFile = new File(scriptsDir, scriptName);
+        File scriptFile = new File(ScriptUtils.getScriptsDirectory(this), scriptName);
 
         try (FileWriter writer = new FileWriter(scriptFile)) {
             writer.write(script.getContent());

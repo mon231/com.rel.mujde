@@ -8,10 +8,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
-// Removed unused menu imports
 import android.view.View;
 import android.view.ViewGroup;
-// Removed unused AdapterView import
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -25,38 +23,28 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
+import java.util.List;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 
 public class ScriptsFragment extends Fragment {
-    private static final String SCRIPTS_DIRECTORY_NAME = "scripts";
-    private String scriptsDirectoryPath;
-
     private ListView listViewScripts;
     private TextView emptyTextView;
     private FloatingActionButton fabAddScript;
     private List<String> scriptsList = new ArrayList<>();
     private ArrayAdapter<String> scriptsAdapter;
 
-    public ScriptsFragment() {
-        // Required empty public constructor
-    }
+    public ScriptsFragment() { }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        // TODO: remove this function?
         super.onCreate(savedInstanceState);
-        // No longer using options menu
-
-        // Initialize scripts directory path
-        File internalDir = requireContext().getFilesDir();
-        File scriptsDir = new File(internalDir, SCRIPTS_DIRECTORY_NAME);
-        scriptsDirectoryPath = scriptsDir.getAbsolutePath();
     }
 
     @Nullable
@@ -127,21 +115,10 @@ public class ScriptsFragment extends Fragment {
 
     private void loadScripts() {
         scriptsList.clear();
-
-        File scriptsDir = new File(scriptsDirectoryPath);
-
-        // Create the directory if it doesn't exist
-        if (!scriptsDir.exists()) {
-            if (!scriptsDir.mkdirs()) {
-                Toast.makeText(requireContext(),
-                        "Failed to create scripts directory",
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-
+        // TODO: cleanup, chmod
         // Set directory permissions to 755 (rwxr-xr-x)
         try {
-            Process chmod = Runtime.getRuntime().exec("chmod 777 " + scriptsDir.getAbsolutePath());
+            Process chmod = Runtime.getRuntime().exec("chmod 777 " + ScriptUtils.getScriptsDirectoryPath(requireContext()));
             chmod.waitFor();
 
             // Also make the shared_prefs directory readable
@@ -162,28 +139,23 @@ public class ScriptsFragment extends Fragment {
         }
 
         // List all .js files
-        if (scriptsDir.exists() && scriptsDir.isDirectory()) {
-            File[] files = scriptsDir.listFiles(file ->
-                    file.isFile() && file.getName().endsWith(".js"));
+        File[] files = ScriptUtils.getScriptsDirectory(requireContext()).listFiles(file ->
+                file.isFile() && file.getName().endsWith(".js"));
 
-            if (files != null && files.length > 0) {
-                for (File file : files) {
-                    scriptsList.add(file.getName());
+        if (files != null && files.length > 0) {
+            for (File file : files) {
+                scriptsList.add(file.getName());
 
-                    // Set file permissions to 644 (rw-r--r--)
-                    try {
-                        Process chmod = Runtime.getRuntime().exec("chmod 777 " + file.getAbsolutePath());
-                        chmod.waitFor();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                // Set file permissions to 644 (rw-r--r--)
+                try {
+                    Process chmod = Runtime.getRuntime().exec("chmod 777 " + file.getAbsolutePath());
+                    chmod.waitFor();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                emptyTextView.setVisibility(View.GONE);
-                listViewScripts.setVisibility(View.VISIBLE);
-            } else {
-                emptyTextView.setVisibility(View.VISIBLE);
-                listViewScripts.setVisibility(View.GONE);
             }
+            emptyTextView.setVisibility(View.GONE);
+            listViewScripts.setVisibility(View.VISIBLE);
         } else {
             emptyTextView.setVisibility(View.VISIBLE);
             listViewScripts.setVisibility(View.GONE);
@@ -228,8 +200,7 @@ public class ScriptsFragment extends Fragment {
     }
 
     private void createNewScript(String fileName) {
-        File scriptsDir = new File(scriptsDirectoryPath);
-        File scriptFile = new File(scriptsDir, fileName);
+        File scriptFile = new File(ScriptUtils.getScriptsDirectory(requireContext()), fileName);
 
         // Check if file already exists
         if (scriptFile.exists()) {
@@ -238,11 +209,6 @@ public class ScriptsFragment extends Fragment {
         }
 
         try {
-            // Create the directory if it doesn't exist
-            if (!scriptsDir.exists()) {
-                scriptsDir.mkdirs();
-            }
-
             // Create the file
             if (scriptFile.createNewFile()) {
                 // Create template content
@@ -296,7 +262,7 @@ public class ScriptsFragment extends Fragment {
     }
 
     private void openScriptEditor(String scriptName) {
-        File scriptFile = new File(scriptsDirectoryPath, scriptName);
+        File scriptFile = new File(ScriptUtils.getScriptsDirectory(requireContext()), scriptName);
 
         if (!scriptFile.exists()) {
             Toast.makeText(requireContext(), "Script file not found", Toast.LENGTH_SHORT).show();
@@ -324,6 +290,7 @@ public class ScriptsFragment extends Fragment {
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         input.setText(content.toString());
         input.setMinLines(10);
+        // TODO: set left-to-right text direction
         input.setMaxLines(20);
         builder.setView(input);
 
@@ -340,12 +307,12 @@ public class ScriptsFragment extends Fragment {
     }
 
     private void saveScript(String scriptName, String content) {
-        File scriptFile = new File(scriptsDirectoryPath, scriptName);
+        File scriptFile = new File(ScriptUtils.getScriptsDirectory(requireContext()), scriptName);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(scriptFile))) {
             writer.write(content);
 
-            // Set file permissions to 644 (rw-r--r--)
+            // TODO: ??? Set file permissions to 644 (rw-r--r--)
             try {
                 Process chmod = Runtime.getRuntime().exec("chmod 777 " + scriptFile.getAbsolutePath());
                 chmod.waitFor();
@@ -388,7 +355,7 @@ public class ScriptsFragment extends Fragment {
     }
 
     private void deleteScript(String scriptName) {
-        File scriptFile = new File(scriptsDirectoryPath, scriptName);
+        File scriptFile = new File(ScriptUtils.getScriptsDirectory(requireContext()), scriptName);
 
         if (scriptFile.exists()) {
             if (scriptFile.delete()) {

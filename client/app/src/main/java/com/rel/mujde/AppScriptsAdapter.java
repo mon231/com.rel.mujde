@@ -20,17 +20,16 @@ import java.util.List;
 import java.util.Map;
 
 public class AppScriptsAdapter extends RecyclerView.Adapter<AppScriptsAdapter.ViewHolder> {
-
     private final Context context;
     private List<ApplicationInfo> appList;
-
     private final Map<String, List<String>> appScriptMappings;
     private final OnScriptSelectionChangedListener onScriptSelectionChangedListener;
 
-    public AppScriptsAdapter(Context context, List<ApplicationInfo> appList, 
-
-                            Map<String, List<String>> appScriptMappings,
-                            OnScriptSelectionChangedListener onScriptSelectionChangedListener) {
+    public AppScriptsAdapter(
+        Context context,
+        List<ApplicationInfo> appList,
+        Map<String, List<String>> appScriptMappings,
+        OnScriptSelectionChangedListener onScriptSelectionChangedListener) {
         this.context = context;
         this.appList = appList;
 
@@ -47,13 +46,11 @@ public class AppScriptsAdapter extends RecyclerView.Adapter<AppScriptsAdapter.Vi
         public TextView appName;
         public TextView packageName;
 
-
         public ViewHolder(View view) {
             super(view);
             appIcon = view.findViewById(R.id.app_icon);
             appName = view.findViewById(R.id.app_name);
             packageName = view.findViewById(R.id.package_name);
-
         }
     }
 
@@ -74,19 +71,18 @@ public class AppScriptsAdapter extends RecyclerView.Adapter<AppScriptsAdapter.Vi
         holder.appName.setText(app.loadLabel(packageManager));
         holder.packageName.setText(app.packageName);
 
-
-        
         // Set item click listener to launch script selection activity
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (context instanceof Activity) {
-                    Intent intent = new Intent(context, ScriptSelectionActivity.class);
-                    intent.putExtra(ScriptSelectionActivity.EXTRA_PACKAGE_NAME, app.packageName);
-                    
-                    Log.d("AppScriptsAdapter", "Launching script selection activity with package: " + app.packageName);
-                    ((Activity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_SCRIPTS);
+                if (!(context instanceof Activity)) {
+                    return;
                 }
+
+                Intent intent = new Intent(context, ScriptSelectionActivity.class);
+                intent.putExtra(ScriptSelectionActivity.EXTRA_PACKAGE_NAME, app.packageName);
+
+                ((Activity)context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_SCRIPTS);
             }
         });
     }

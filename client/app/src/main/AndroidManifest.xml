@@ -73,7 +73,6 @@
             android:theme="@style/Theme.MujdeTheme"
             android:parentActivityName=".ActivityMain" />
 
-        <!--Guide at: https://infinum.com/the-capsized-eight/share-files-using-fileprovider-->
         <provider
             android:authorities="${applicationId}"
             android:name="androidx.core.content.FileProvider"

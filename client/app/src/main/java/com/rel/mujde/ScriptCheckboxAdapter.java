@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScriptCheckboxAdapter extends RecyclerView.Adapter<ScriptCheckboxAdapter.ViewHolder> {
-
     private final List<String> availableScripts;
     private final List<String> selectedScripts;
 

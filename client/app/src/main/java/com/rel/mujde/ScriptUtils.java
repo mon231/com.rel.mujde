@@ -1,18 +1,20 @@
 package com.rel.mujde;
 
-import android.content.SharedPreferences;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import de.robv.android.xposed.XSharedPreferences;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+// TODO: cleanup
 
 public class ScriptUtils {
 
@@ -73,6 +75,20 @@ public class ScriptUtils {
         }
 
         return appScriptMappings;
+    }
+
+    public static File getScriptsDirectory(Context context) {
+        File scriptsDir = new File(context.getFilesDir(), Constants.SCRIPTS_DIRECTORY_NAME);
+
+        if (!scriptsDir.exists()) {
+            scriptsDir.mkdirs();
+        }
+
+        return scriptsDir;
+    }
+
+    public static String getScriptsDirectoryPath(Context context) {
+        return getScriptsDirectory(context).getAbsolutePath();
     }
 
     /**

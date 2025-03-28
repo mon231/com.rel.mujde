@@ -21,9 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ScriptSelectionActivity extends AppCompatActivity {
-
     public static final String EXTRA_PACKAGE_NAME = "extra_package_name";
-    private static final String SCRIPTS_DIRECTORY_NAME = "scripts";
 
     private String packageName;
     private List<String> selectedScripts = new ArrayList<>();
@@ -116,13 +114,11 @@ public class ScriptSelectionActivity extends AppCompatActivity {
     }
 
     /**
-     * Filter a list of script names to only include those that actually exist as files
-     * @param scriptNames List of script names to filter
-     * @return List of valid script names that exist as files
+     * get a reduced list where all script-files are ensured to exist and be valid
      */
     private List<String> filterValidScripts(List<String> scriptNames) {
         List<String> validScripts = new ArrayList<>();
-        File scriptsDir = new File(getFilesDir(), SCRIPTS_DIRECTORY_NAME);
+        File scriptsDir = new File(getFilesDir(), Constants.SCRIPTS_DIRECTORY_NAME);
 
         for (String scriptName : scriptNames) {
             File scriptFile = new File(scriptsDir, scriptName);
@@ -136,40 +132,28 @@ public class ScriptSelectionActivity extends AppCompatActivity {
 
     private void loadAvailableScripts() {
         availableScripts.clear();
-
-        // Get scripts directory path
-        File internalDir = getFilesDir();
-        File scriptsDir = new File(internalDir, SCRIPTS_DIRECTORY_NAME);
-
-        // Create the directory if it doesn't exist
-        if (!scriptsDir.exists()) {
-            scriptsDir.mkdirs();
-        }
-
-        // Filter out non-existent scripts from selectedScripts
         List<String> validSelectedScripts = filterValidScripts(selectedScripts);
 
         // Update selectedScripts with only valid scripts
         selectedScripts.clear();
         selectedScripts.addAll(validSelectedScripts);
 
-        // List all .js files
-        if (scriptsDir.exists() && scriptsDir.isDirectory()) {
-            File[] files = scriptsDir.listFiles(file ->
-                    file.isFile() && file.getName().endsWith(".js"));
+        File[] scriptFiles = ScriptUtils.getScriptsDirectory(this).listFiles(file ->
+            file.isFile() && file.getName().endsWith(".js"));
 
-            if (files != null && files.length > 0) {
-                for (File file : files) {
-                    availableScripts.add(file.getName());
+        if (scriptFiles == null || scriptFiles.length == 0) {
+            return;
+        }
 
-                    // Set file permissions to 644 (rw-r--r--)
-                    try {
-                        Process chmod = Runtime.getRuntime().exec("chmod 777 " + file.getAbsolutePath());
-                        chmod.waitFor();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+        for (File file : scriptFiles) {
+            availableScripts.add(file.getName());
+
+            // TODO: use chmod util-cls
+            try {
+                Process chmod = Runtime.getRuntime().exec("chmod 777 " + file.getAbsolutePath());
+                chmod.waitFor();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

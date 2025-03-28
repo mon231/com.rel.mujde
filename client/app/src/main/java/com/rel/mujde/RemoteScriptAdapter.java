@@ -8,15 +8,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.rel.mujde.api.model.Script;
 
-import java.util.List;
-
 public class RemoteScriptAdapter extends ArrayAdapter<Script> {
-
     private final Context context;
     private final List<Script> scripts;
     private final ScriptActionListener listener;
@@ -37,13 +35,13 @@ public class RemoteScriptAdapter extends ArrayAdapter<Script> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
+
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.item_remote_script, parent, false);
         }
 
         Script script = scripts.get(position);
-
         TextView textScriptName = view.findViewById(R.id.text_remote_script_name);
         TextView textScriptId = view.findViewById(R.id.text_remote_script_id);
         TextView textLastModified = view.findViewById(R.id.text_remote_script_modified);
@@ -54,14 +52,13 @@ public class RemoteScriptAdapter extends ArrayAdapter<Script> {
         textScriptId.setText("ID: " + script.getScriptId());
         textLastModified.setText("Last Modified: " + script.getLastModified());
 
-        // Set up button click listeners
-        btnDownload.setOnClickListener(v -> {
+        btnDownload.setOnClickListener(e -> {
             if (listener != null) {
                 listener.onDownloadScript(script);
             }
         });
 
-        btnDelete.setOnClickListener(v -> {
+        btnDelete.setOnClickListener(e -> {
             if (listener != null) {
                 listener.onDeleteScript(script);
             }

@@ -44,34 +44,42 @@ public class ActivityMain extends AppCompatActivity {
         }
 
         if (pref == null) {
-            new AlertDialog.Builder(this)
-            .setMessage(R.string.module_not_enabled)
-            .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // terminate app's process
-                    Process.killProcess(android.os.Process.myPid());
-                    System.exit(1);
-                }
-            })
-            .setNegativeButton(R.string.continue_anyway, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // continue with limited functionality
-                    pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
-                    initializeFragments();
-                    setupNavigation();
-                    setupBackPressHandling();
-                }
-            })
-            .setCancelable(false)
-            .show();
+            suggestPartialInitialization();
             return;
         }
 
         initializeFragments();
         setupNavigation();
         setupBackPressHandling();
+    }
+
+    private void suggestPartialInitialization()
+    {
+        new AlertDialog.Builder(this)
+        .setMessage(R.string.module_not_enabled)
+        .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // terminate app's process
+                Process.killProcess(android.os.Process.myPid());
+
+                final int EXIT_FAILURE = 1;
+                System.exit(EXIT_FAILURE);
+            }
+        })
+        .setNegativeButton(R.string.continue_anyway, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // continue with limited functionality
+                // TODO: note that its extremely limited and error-prone
+                pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+                initializeFragments();
+                setupNavigation();
+                setupBackPressHandling();
+            }
+        })
+        .setCancelable(false)
+        .show();
     }
 
     private void setupBackPressHandling() {
@@ -126,42 +134,45 @@ public class ActivityMain extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        loadFragment(homeFragment);
+                        break;
 
-                if (itemId == R.id.navigation_home) {
-                    loadFragment(homeFragment);
-                    return true;
-                } else if (itemId == R.id.navigation_scripts) {
-                    loadFragment(scriptsFragment);
-                    return true;
-                } else if (itemId == R.id.navigation_apps) {
-                    loadFragment(appsFragment);
-                    return true;
+                    case R.id.navigation_scripts:
+                        loadFragment(scriptsFragment);
+                        break;
+
+                    case R.id.navigation_apps:
+                        loadFragment(appsFragment);
+                        break;
+
+                    default:
+                        return false;
                 }
 
-                return false;
+                return true;
             }
         });
 
-        // Set Home tab as selected by default
+        // navbar start from home
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
     }
 
     private void loadFragment(Fragment fragment) {
-        if (fragment != null) {
-            currentFragment = fragment;
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, fragment);
-            transaction.commit();
+        // TODO: should we nullcheck fragment param?
 
-            // Update the toolbar title based on the selected fragment
-            if (fragment instanceof HomeFragment) {
-                getSupportActionBar().setTitle(R.string.app_name);
-            } else if (fragment instanceof ScriptsFragment) {
-                getSupportActionBar().setTitle(R.string.title_scripts);
-            } else if (fragment instanceof AppsFragment) {
-                getSupportActionBar().setTitle(R.string.title_apps);
-            }
+        currentFragment = fragment;
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+
+        if (fragment instanceof HomeFragment) {
+            getSupportActionBar().setTitle(R.string.app_name);
+        } else if (fragment instanceof ScriptsFragment) {
+            getSupportActionBar().setTitle(R.string.title_scripts);
+        } else if (fragment instanceof AppsFragment) {
+            getSupportActionBar().setTitle(R.string.title_apps);
         }
     }
 }

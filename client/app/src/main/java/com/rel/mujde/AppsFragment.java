@@ -43,11 +43,8 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
     private RecyclerView appListRecyclerView;
     private SearchView searchView;
     private ProgressBar loadingProgress;
-
     private List<ApplicationInfo> enabledApps = new ArrayList<>();
-
     private Map<String, List<String>> appScriptMappings = new HashMap<>();
-
     private Executor executor = Executors.newSingleThreadExecutor();
     private boolean hasUnsavedChanges = false;
 
@@ -66,6 +63,8 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        // TODO: cleanup
+
         super.onCreate(savedInstanceState);
         try {
             pref = getActivity().getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
@@ -91,8 +90,6 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
         appListRecyclerView = view.findViewById(R.id.app_list);
         searchView = view.findViewById(R.id.search_view);
         loadingProgress = view.findViewById(R.id.loading_progress);
-
-
         appListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
@@ -110,35 +107,29 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
                 Field cursorDrawableField = TextView.class.getDeclaredField("mCursorDrawableRes");
                 cursorDrawableField.setAccessible(true);
                 cursorDrawableField.set(searchText, R.drawable.white_cursor);
-            } catch (Exception e) {
-                // Ignore exceptions
-            }
+            } catch (Exception e) { }
         }
 
         searchView.setOnQueryTextListener(this);
-
-
     }
 
     private void loadAppScriptMappings() {
-        appScriptMappings.clear();
-        if (pref != null) {
-            Map<String, List<String>> mappings = ScriptUtils.getAllAppScriptMappings(pref);
-            appScriptMappings.putAll(mappings);
+        // TODO: should we nullcheck pref member? should it be a member?
+        if (pref == null) {
+            return;
         }
 
+        appScriptMappings.clear();
+        appScriptMappings.putAll(ScriptUtils.getAllAppScriptMappings(pref));
         hasUnsavedChanges = false;
     }
 
-
-
     private void saveAppScriptMappings() {
         try {
-            if (pref != null) {
-                // Save the app script mappings
-                ScriptUtils.saveAppScriptMappings(pref, appScriptMappings);
-            }
+            // TODO: should we nullcheck pref member?
+            ScriptUtils.saveAppScriptMappings(pref, appScriptMappings);
         } catch (Exception e) {
+            // TODO: snackbar vs toast?
             Snackbar.make(
                     getActivity().findViewById(R.id.root_view_for_snackbar),
                     R.string.error_saving_settings,
@@ -156,7 +147,7 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
             public void run() {
                 try {
                     final List<ApplicationInfo> enabledAppsList = getEnabledApps();
-
+                    // TODO: cleanup
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
