@@ -122,20 +122,6 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
         hasUnsavedChanges = false;
     }
 
-    private void saveAppScriptMappings() {
-        try {
-            // TODO: should we nullcheck pref member?
-            ScriptUtils.saveAppScriptMappings(pref, appScriptMappings);
-        } catch (Exception e) {
-            // TODO: snackbar vs toast?
-            Snackbar.make(
-                    getActivity().findViewById(R.id.root_view_for_snackbar),
-                    R.string.error_saving_settings,
-                    Snackbar.LENGTH_SHORT
-            ).show();
-        }
-    }
-
     private void loadEnabledApps() {
         loadingProgress.setVisibility(View.VISIBLE);
         appListRecyclerView.setVisibility(View.GONE);
