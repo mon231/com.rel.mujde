@@ -1,5 +1,4 @@
 package com.rel.mujde.api;
-
 import com.rel.mujde.api.model.Script;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public interface ScriptService {
 
     @GET("scripts/{id}")
     Call<Script> getScriptById(@Path("id") int id);
-    
+
     @DELETE("scripts/{id}")
     Call<Void> deleteScript(@Path("id") int id);
 }

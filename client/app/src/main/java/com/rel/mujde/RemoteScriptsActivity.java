@@ -51,8 +51,6 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
         emptyTextView = findViewById(R.id.text_empty_remote_scripts);
         progressBar = findViewById(R.id.progress_bar);
 
-        // Initialize API service
-        // TODO: ScriptService ???
         scriptService = ApiClient.getClient(this).create(ScriptService.class);
 
         // Initialize adapter with this activity as the listener

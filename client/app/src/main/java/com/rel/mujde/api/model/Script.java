@@ -1,15 +1,13 @@
 package com.rel.mujde.api.model;
+import androidx.annotation.Nullable;
 
-/**
- * Represents a Frida script from the server.
- */
 public class Script {
     private int scriptId;
     private String scriptName;
     private String scriptPath;
     private String networkPath;
     private String lastModified;  // ISO-8601 formatted date string
-    private String content;  // Transient field, not stored in database
+    private @Nullable String content;  // optional field
 
     public Script() { }
 
@@ -53,6 +51,7 @@ public class Script {
         this.lastModified = lastModified;
     }
 
+    @Nullable
     public String getContent() {
         return content;
     }
