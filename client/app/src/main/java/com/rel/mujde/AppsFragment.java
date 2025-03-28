@@ -61,9 +61,8 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        // TODO: cleanup
-
         super.onCreate(savedInstanceState);
+
         try {
             pref = getActivity().getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
         } catch (Exception e) {
@@ -72,15 +71,15 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
 
         if (pref == null) {
             new AlertDialog.Builder(getActivity())
-                    .setMessage(R.string.module_not_enabled)
-                    .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            getActivity().finish();
-                        }
-                    })
-                    .setCancelable(false)
-                    .show();
+                .setMessage(R.string.module_not_enabled)
+                .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getActivity().finish();
+                    }
+                })
+                .setCancelable(false)
+                .show();
         }
     }
 
@@ -112,11 +111,6 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
     }
 
     private void loadAppScriptMappings() {
-        // NOTE used in case of partial initialization (where Mujde's module isn't enabled)
-        if (pref == null) {
-            return;
-        }
-
         appScriptMappings.clear();
         appScriptMappings.putAll(ScriptUtils.getAllAppScriptMappings(pref));
         hasUnsavedChanges = false;
@@ -129,55 +123,52 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
         executor.execute(new Runnable() {
             @Override
             public void run() {
+                Activity activity = getActivity();
+                if (activity == null) {
+                    return;
+                }
+
                 try {
                     final List<ApplicationInfo> enabledAppsList = getEnabledApps();
-                    // TODO: cleanup
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (getActivity() == null) return;
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            enabledApps.clear();
+                            enabledApps.addAll(enabledAppsList);
 
-                                enabledApps.clear();
-                                enabledApps.addAll(enabledAppsList);
+                            if (enabledApps.isEmpty()) {
+                                return;
+                            }
 
-                                if (!enabledApps.isEmpty()) {
-                                    AppListAdapter adapter = new AppListAdapter(
-                                            getActivity(),
-                                            enabledApps,
-                                            new AppListAdapter.OnScriptSelectionChangedListener() {
-                                                @Override
-                                                public void onScriptSelectionChanged(String packageName, List<String> selectedScripts) {
-                                                    // Update the app script mappings
-                                                    if (selectedScripts.isEmpty()) {
-                                                        appScriptMappings.remove(packageName);
-                                                    } else {
-                                                        appScriptMappings.put(packageName, new ArrayList<>(selectedScripts));
-                                                    }
+                            AppListAdapter adapter = new AppListAdapter(
+                                activity,
+                                enabledApps,
+                                new AppListAdapter.OnScriptSelectionChangedListener() {
+                                    @Override
+                                    public void onScriptSelectionChanged(String packageName, List<String> selectedScripts) {
+                                        if (selectedScripts.isEmpty()) {
+                                            appScriptMappings.remove(packageName);
+                                        } else {
+                                            appScriptMappings.put(packageName, new ArrayList<>(selectedScripts));
+                                        }
 
-                                                    hasUnsavedChanges = true;
-                                                }
-                                            }
-                                    );
-
-                                    appListRecyclerView.setAdapter(adapter);
-                                    loadingProgress.setVisibility(View.GONE);
-                                    appListRecyclerView.setVisibility(View.VISIBLE);
+                                        hasUnsavedChanges = true;
+                                    }
                                 }
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (getActivity() == null) return;
+                            );
 
-                                loadingProgress.setVisibility(View.GONE);
-                            }
-                        });
-                    }
+                            appListRecyclerView.setAdapter(adapter);
+                            loadingProgress.setVisibility(View.GONE);
+                            appListRecyclerView.setVisibility(View.VISIBLE);
+                        }
+                    });
+                } catch (Exception e) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingProgress.setVisibility(View.GONE);
+                        }
+                    });
                 }
             }
         });
@@ -249,11 +240,9 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Constants.REQUEST_CODE_SELECT_SCRIPTS && resultCode == Activity.RESULT_OK && data != null) {
-            // Reload the app script mappings from SharedPreferences
+        if (requestCode == Constants.REQUEST_CODE_SELECT_SCRIPTS && resultCode == Activity.RESULT_OK) {
             loadAppScriptMappings();
 
-            // Update the adapter
             if (appListRecyclerView.getAdapter() != null) {
                 appListRecyclerView.getAdapter().notifyDataSetChanged();
             }

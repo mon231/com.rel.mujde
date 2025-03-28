@@ -91,26 +91,18 @@ public class ActivityMain extends AppCompatActivity {
                     return;
                 }
 
-                // TODO: wtf???
-                // let the user choose to save changes before exiting
+                // popup unsaved changes dialog if needed
                 if (appsFragment != null && appsFragment.hasUnsavedChanges()) {
                     new AlertDialog.Builder(ActivityMain.this)
                         .setTitle(R.string.unsaved_changes_title)
                         .setMessage(R.string.unsaved_changes_message)
-                        .setPositiveButton(R.string.save_and_exit, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Save changes and exit
-                                finish();
-                            }
-                        })
+                        .setPositiveButton(R.string.cancel, null)
                         .setNegativeButton(R.string.discard_and_exit, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish();
                             }
                         })
-                        .setNeutralButton(R.string.cancel, null)
                         .show();
                 } else {
                     finish();
@@ -124,7 +116,7 @@ public class ActivityMain extends AppCompatActivity {
         scriptsFragment = new ScriptsFragment();
         appsFragment = new AppsFragment();
 
-        // start from home fragment
+        // NOTE to start from home fragment
         loadFragment(homeFragment);
     }
 
@@ -154,13 +146,11 @@ public class ActivityMain extends AppCompatActivity {
             }
         });
 
-        // navbar start from home
+        // navbar highlight home option
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
     }
 
     private void loadFragment(Fragment fragment) {
-        // TODO: should we nullcheck fragment param?
-
         currentFragment = fragment;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
