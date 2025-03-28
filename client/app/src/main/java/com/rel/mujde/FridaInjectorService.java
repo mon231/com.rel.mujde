@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import java.io.File;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -124,16 +125,14 @@ public class FridaInjectorService extends Service {
 
             ScriptUtils.getScriptsForPackage(request.getPackageName(), pref).forEach(script -> {
                 Log.d("[Mujde]", "about to frida-inject " + script + " into " + request.toString());
-
-                // TODO: should we add that "/"?, use new Utils
-                String scriptFullPath = ScriptUtils.getScriptsDirectoryPath(getApplicationContext()) + "/" + script;
+                File scriptFile = ScriptUtils.getScriptFile(getApplicationContext(), script);
 
                 try {
                     ProcessBuilder processBuilder = new ProcessBuilder(
                         "su", "-c",
                         INJECTOR_PATH, "-e",
                         "-p", String.valueOf(request.getPid()),
-                        "-s", scriptFullPath
+                        "-s", scriptFile.getAbsolutePath()
                     );
 
                     processBuilder.start();

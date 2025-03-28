@@ -77,6 +77,10 @@ public class ScriptUtils {
         return appScriptMappings;
     }
 
+    public static File[] getScripts(Context context) {
+        return getScriptsDirectory(context).listFiles(file -> file.isFile() && file.getName().endsWith(".js"));
+    }
+
     public static File getScriptsDirectory(Context context) {
         File scriptsDir = new File(context.getFilesDir(), Constants.SCRIPTS_DIRECTORY_NAME);
 
@@ -87,14 +91,17 @@ public class ScriptUtils {
         return scriptsDir;
     }
 
+    public static File getScriptFile(Context context, String scriptName) {
+        return new File(getScriptsDirectory(context), scriptName);
+    }
+
     public static String getScriptsDirectoryPath(Context context) {
         return getScriptsDirectory(context).getAbsolutePath();
     }
 
     /**
-     * TODO: note
-     * can get both SharedPreferences and XSharedPreferences
-     * Get scripts for a specific package from SharedPreferences
+     * NOTE that XSharedPreferences inherits from SharedPreferences,
+     * and this function is used with both types of arguments
      */
     public static List<String> getScriptsForPackage(String packageName, SharedPreferences prefs) {
         List<String> scripts = new ArrayList<>();

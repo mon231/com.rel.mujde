@@ -192,51 +192,47 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
     }
 
     private void checkForConflictAndSave(Script script) {
-        // Ensure the script name has .js extension for checking conflicts
         String scriptName = script.getScriptName();
         if (!scriptName.endsWith(".js")) {
+            // TODO: use Constants.SCRIPT_EXTENSION
             scriptName = scriptName + ".js";
         }
 
-        // Check if a local script with the same name exists
         // TODO: have util to ScriptUtils get script file
-        File localScriptFile = new File(ScriptUtils.getScriptsDirectory(this), scriptName);
+        File localScriptFile = ScriptUtils.getScriptFile((Context)this, scriptName);
 
-        if (localScriptFile.exists()) {
-            // There's a conflict, we need to compare timestamps and ask the user
-            long localLastModified = localScriptFile.lastModified();
-            long remoteLastModified = 0;
-
-            // Parse the remote timestamp
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.US);
-                Date remoteDate = sdf.parse(script.getLastModified());
-                if (remoteDate != null) {
-                    remoteLastModified = remoteDate.getTime();
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-                // If we can't parse the date, just use current time
-                remoteLastModified = System.currentTimeMillis();
-            }
-
-            // Determine which is newer
-            String newerVersion = (remoteLastModified > localLastModified) ? "remote" : "local";
-
-            // Show conflict resolution dialog
-            new AlertDialog.Builder(this)
-                    .setTitle("Script Already Exists")
-                    .setMessage("A script with the name " + scriptName + " already exists locally. " +
-                            "The " + newerVersion + " version is newer. Do you want to override the local script?")
-                    .setPositiveButton("Override", (dialog, which) -> {
-                        saveScriptLocally(script);
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        } else {
-            // No conflict, just save
+        if (!localScriptFile.exists()) {
             saveScriptLocally(script);
+            return;
         }
+
+        // There's a conflict, we need to compare timestamps and ask the user
+        long remoteLastModified = 0;
+        long localLastModified = localScriptFile.lastModified();
+
+        // Parse the remote timestamp
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.US);
+            Date remoteDate = sdf.parse(script.getLastModified());
+            remoteLastModified = remoteDate.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // TODO: toast? return?
+        }
+
+        // Determine which is newer
+        String newerVersion = (remoteLastModified > localLastModified) ? "remote" : "local";
+
+        // Show conflict resolution dialog
+        new AlertDialog.Builder(this)
+            .setTitle("Script Already Exists")
+            .setMessage("A script with the name " + scriptName + " already exists locally. " +
+                    "The " + newerVersion + " version is newer. Do you want to override the local script?")
+            .setPositiveButton("Override", (dialog, which) -> {
+                saveScriptLocally(script);
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
     }
 
     private void saveScriptLocally(Script script) {
@@ -249,7 +245,7 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
         }
 
         // Save the script content to a file
-        File scriptFile = new File(ScriptUtils.getScriptsDirectory(this), scriptName);
+        File scriptFile = ScriptUtils.getScriptFile((Context)this, scriptName);
 
         try (FileWriter writer = new FileWriter(scriptFile)) {
             writer.write(script.getContent());
@@ -270,6 +266,7 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
                 editor.putString(scriptName, script.getContent());
                 editor.apply();
 
+                // TODO: remove this ??
                 // Make the SharedPreferences file world-readable
                 File prefsDir = new File(getApplicationInfo().dataDir, "shared_prefs");
                 File prefsFile = new File(prefsDir, "script_contents.xml");

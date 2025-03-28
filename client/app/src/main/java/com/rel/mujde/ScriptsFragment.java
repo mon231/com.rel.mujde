@@ -139,8 +139,7 @@ public class ScriptsFragment extends Fragment {
         }
 
         // List all .js files
-        File[] files = ScriptUtils.getScriptsDirectory(requireContext()).listFiles(file ->
-                file.isFile() && file.getName().endsWith(".js"));
+        File[] files = ScriptUtils.getScripts(requireContext());
 
         if (files != null && files.length > 0) {
             for (File file : files) {
@@ -154,6 +153,8 @@ public class ScriptsFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+
+            // TOOD: ???????????
             emptyTextView.setVisibility(View.GONE);
             listViewScripts.setVisibility(View.VISIBLE);
         } else {
@@ -200,7 +201,7 @@ public class ScriptsFragment extends Fragment {
     }
 
     private void createNewScript(String fileName) {
-        File scriptFile = new File(ScriptUtils.getScriptsDirectory(requireContext()), fileName);
+        File scriptFile = ScriptUtils.getScriptFile(requireContext(), fileName);
 
         // Check if file already exists
         if (scriptFile.exists()) {
@@ -262,7 +263,7 @@ public class ScriptsFragment extends Fragment {
     }
 
     private void openScriptEditor(String scriptName) {
-        File scriptFile = new File(ScriptUtils.getScriptsDirectory(requireContext()), scriptName);
+        File scriptFile = ScriptUtils.getScriptFile(requireContext(), scriptName);
 
         if (!scriptFile.exists()) {
             Toast.makeText(requireContext(), "Script file not found", Toast.LENGTH_SHORT).show();
@@ -307,7 +308,7 @@ public class ScriptsFragment extends Fragment {
     }
 
     private void saveScript(String scriptName, String content) {
-        File scriptFile = new File(ScriptUtils.getScriptsDirectory(requireContext()), scriptName);
+        File scriptFile = ScriptUtils.getScriptFile(requireContext(), scriptName);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(scriptFile))) {
             writer.write(content);
@@ -355,7 +356,7 @@ public class ScriptsFragment extends Fragment {
     }
 
     private void deleteScript(String scriptName) {
-        File scriptFile = new File(ScriptUtils.getScriptsDirectory(requireContext()), scriptName);
+        File scriptFile = ScriptUtils.getScriptFile(requireContext(), scriptName);
 
         if (scriptFile.exists()) {
             if (scriptFile.delete()) {

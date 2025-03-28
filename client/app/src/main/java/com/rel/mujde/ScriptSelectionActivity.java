@@ -2,6 +2,7 @@ package com.rel.mujde;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -118,10 +119,9 @@ public class ScriptSelectionActivity extends AppCompatActivity {
      */
     private List<String> filterValidScripts(List<String> scriptNames) {
         List<String> validScripts = new ArrayList<>();
-        File scriptsDir = new File(getFilesDir(), Constants.SCRIPTS_DIRECTORY_NAME);
 
         for (String scriptName : scriptNames) {
-            File scriptFile = new File(scriptsDir, scriptName);
+            File scriptFile = ScriptUtils.getScriptFile((Context)this, scriptName);
             if (scriptFile.exists() && scriptFile.isFile()) {
                 validScripts.add(scriptName);
             }
@@ -138,9 +138,7 @@ public class ScriptSelectionActivity extends AppCompatActivity {
         selectedScripts.clear();
         selectedScripts.addAll(validSelectedScripts);
 
-        File[] scriptFiles = ScriptUtils.getScriptsDirectory(this).listFiles(file ->
-            file.isFile() && file.getName().endsWith(".js"));
-
+        File[] scriptFiles = ScriptUtils.getScripts(this);
         if (scriptFiles == null || scriptFiles.length == 0) {
             return;
         }
