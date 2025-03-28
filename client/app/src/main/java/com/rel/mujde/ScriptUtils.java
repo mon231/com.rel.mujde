@@ -1,18 +1,18 @@
 package com.rel.mujde;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
-
-import android.content.Context;
-import android.content.SharedPreferences;
 
 // TODO: cleanup
 

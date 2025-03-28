@@ -1,9 +1,9 @@
 package com.rel.mujde;
 
-import android.util.Log;
-import android.content.Intent;
-import android.content.Context;
 import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 
 public class BootCompletedHandler extends BroadcastReceiver {
     @Override

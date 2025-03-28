@@ -1,7 +1,5 @@
 package com.rel.mujde.api.model;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Represents a Frida script from the server.
  */
@@ -13,9 +11,7 @@ public class Script {
     private String lastModified;  // ISO-8601 formatted date string
     private String content;  // Transient field, not stored in database
 
-    public Script() {
-        // Default constructor for Gson
-    }
+    public Script() { }
 
     public int getScriptId() {
         return scriptId;

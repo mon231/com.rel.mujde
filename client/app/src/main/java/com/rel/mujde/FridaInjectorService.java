@@ -1,15 +1,15 @@
 package com.rel.mujde;
 
-import android.os.Build;
-import android.util.Log;
-import android.os.IBinder;
-import android.app.Service;
-import android.content.Intent;
-import android.content.Context;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -17,8 +17,6 @@ import androidx.core.app.NotificationCompat;
 import java.io.File;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static android.content.Context.MODE_WORLD_READABLE;
 
 public class FridaInjectorService extends Service {
     private Thread injectorThread = null;

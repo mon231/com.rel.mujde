@@ -1,23 +1,14 @@
 package com.rel.mujde;
 
-import android.util.Log;
 import android.app.Activity;
-import android.content.Context;
 import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 import android.os.Process;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
-import android.content.Intent;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;

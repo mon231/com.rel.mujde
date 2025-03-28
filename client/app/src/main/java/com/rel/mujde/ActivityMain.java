@@ -1,22 +1,22 @@
 package com.rel.mujde;
 
-import android.os.Bundle;
-import android.os.Process;
-import android.view.MenuItem;
 import android.content.Intent;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Process;
+import android.view.MenuItem;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.activity.OnBackPressedCallback;
 
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 public class ActivityMain extends AppCompatActivity {
     private SharedPreferences pref;

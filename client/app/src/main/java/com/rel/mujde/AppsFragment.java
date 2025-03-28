@@ -1,5 +1,7 @@
 package com.rel.mujde;
 
+import static android.content.Context.MODE_WORLD_READABLE;
+
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +13,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import static android.content.Context.MODE_WORLD_READABLE;
 
 public class AppsFragment extends Fragment implements SearchView.OnQueryTextListener {
     private SharedPreferences pref;
