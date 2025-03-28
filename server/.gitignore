@@ -84,3 +84,6 @@ Thumbs.db
 # Server specific
 scripts/
 logs/
+
+effective-pom.xml
+dependency-reduced-pom.xml
