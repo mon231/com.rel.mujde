@@ -43,7 +43,7 @@ public class InjectionRequester implements IXposedHookLoadPackage {
             return;
         }
 
-        hookActivityOnCreate(lpparam, scripts);
+        hookActivityOnCreate(lpparam);
     }
 
     private void sendInjectionRequest(Activity activity)
@@ -58,7 +58,7 @@ public class InjectionRequester implements IXposedHookLoadPackage {
         activity.sendBroadcast(intent);
     }
 
-    private void hookActivityOnCreate(XC_LoadPackage.LoadPackageParam lpparam, final List<String> scripts) {
+    private void installHookOnActivityCreation(XC_LoadPackage.LoadPackageParam lpparam) {
         XposedHelpers.findAndHookMethod(
             Activity.class.getName(),
             lpparam.classLoader,
@@ -68,13 +68,14 @@ public class InjectionRequester implements IXposedHookLoadPackage {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     final Activity activity = (Activity)param.thisObject;
+                    final int DELAY_ONE_SEC = 1000;
 
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             sendInjectionRequest(activity);
                         }
-                    }, 1000); // TODO: do we want Delay by 1 second to ensure the activity is fully created???
+                    }, DELAY_ONE_SEC);
                 }
             }
         );
