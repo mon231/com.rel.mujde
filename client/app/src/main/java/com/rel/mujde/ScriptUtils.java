@@ -14,28 +14,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-// TODO: cleanup
-
 public class ScriptUtils {
-
-    /**
-     * Save app script mappings to SharedPreferences
-     * @param prefs SharedPreferences instance
-     * @param appScriptMappings Map of package names to lists of script names
-     */
     public static void saveAppScriptMappings(SharedPreferences prefs, Map<String, List<String>> appScriptMappings) {
         try {
             JSONObject jsonObject = new JSONObject();
 
-            // Only save apps that have selected scripts
             for (Map.Entry<String, List<String>> entry : appScriptMappings.entrySet()) {
-                if (!entry.getValue().isEmpty()) {
-                    JSONArray scriptsArray = new JSONArray();
-                    for (String script : entry.getValue()) {
-                        scriptsArray.put(script);
-                    }
-                    jsonObject.put(entry.getKey(), scriptsArray);
+                if (entry.getValue().isEmpty()) {
+                    continue;
                 }
+
+                JSONArray scriptsArray = new JSONArray();
+                for (String script : entry.getValue()) {
+                    scriptsArray.put(script);
+                }
+
+                jsonObject.put(entry.getKey(), scriptsArray);
             }
 
             SharedPreferences.Editor editor = prefs.edit();
@@ -46,11 +40,6 @@ public class ScriptUtils {
         }
     }
 
-    /**
-     * Get all app script mappings from SharedPreferences
-     * @param prefs SharedPreferences instance
-     * @return Map of package names to lists of script names
-     */
     public static Map<String, List<String>> getAllAppScriptMappings(SharedPreferences prefs) {
         Map<String, List<String>> appScriptMappings = new HashMap<>();
 
@@ -108,10 +97,7 @@ public class ScriptUtils {
         return scriptName + Constants.SCRIPT_FILE_EXT;
     }
 
-    /**
-     * NOTE that XSharedPreferences inherits from SharedPreferences,
-     * and this function is used with both types of arguments
-     */
+    // NOTE XSharedPreferences inherits from SharedPreferences, this function is used for both
     public static List<String> getScriptsForPackage(String packageName, SharedPreferences prefs) {
         List<String> scripts = new ArrayList<>();
 

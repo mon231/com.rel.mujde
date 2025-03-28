@@ -39,12 +39,6 @@ public class ScriptsFragment extends Fragment {
 
     public ScriptsFragment() { }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        // TODO: remove this function?
-        super.onCreate(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -54,7 +48,7 @@ public class ScriptsFragment extends Fragment {
         emptyTextView = view.findViewById(R.id.text_empty_scripts);
         fabAddScript = view.findViewById(R.id.fab_add_script);
 
-        // Initialize the custom adapter with edit and delete buttons
+        // setup callbacks for app-item buttons
         scriptsAdapter = new ScriptAdapter(requireContext(), scriptsList, new ScriptAdapter.ScriptActionListener() {
             @Override
             public void onEditScript(String scriptName) {
@@ -66,17 +60,15 @@ public class ScriptsFragment extends Fragment {
                 showDeleteScriptDialog(scriptName);
             }
         });
-        listViewScripts.setAdapter(scriptsAdapter);
 
-        // Set up click listeners
+        listViewScripts.setAdapter(scriptsAdapter);
         setupListeners(view);
 
-        // Load scripts
         loadScripts();
-
         return view;
     }
 
+    // TODO: cleanups
     private void setupListeners(View view) {
         // FAB click listener to add a new script
         fabAddScript.setOnClickListener(v -> showAddScriptDialog());
@@ -97,23 +89,17 @@ public class ScriptsFragment extends Fragment {
             Intent intent = new Intent(requireContext(), RemoteScriptsActivity.class);
             startActivity(intent);
         });
-
-        // No longer using click/long-click listeners on list items
-        // Edit and delete functionality is now handled by buttons in each list item
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh the scripts list when the fragment becomes visible
         loadScripts();
     }
 
     private void loadScripts() {
         scriptsList.clear();
-
         AccessibilityUtils.makeDirWorldReadable(ScriptUtils.getScriptsDirectory(requireContext()));
-
 
         File[] files = ScriptUtils.getScripts(requireContext());
         if (files != null && files.length > 0) {
@@ -180,7 +166,7 @@ public class ScriptsFragment extends Fragment {
             AccessibilityUtils.makeFileWorldReadable(scriptFile);
             Toast.makeText(requireContext(), "Script created successfully", Toast.LENGTH_SHORT).show();
 
-            loadScripts(); // Refresh the list
+            loadScripts();
             openScriptEditor(fileName);
         } catch (IOException e) {
             Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
