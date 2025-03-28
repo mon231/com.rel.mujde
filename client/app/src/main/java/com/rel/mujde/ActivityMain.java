@@ -70,8 +70,7 @@ public class ActivityMain extends AppCompatActivity {
         .setNegativeButton(R.string.continue_anyway, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // continue with limited functionality
-                // TODO: note that its extremely limited and error-prone
+                // continue with limited functionality, private shared-pref
                 pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
                 initializeFragments();
                 setupNavigation();
