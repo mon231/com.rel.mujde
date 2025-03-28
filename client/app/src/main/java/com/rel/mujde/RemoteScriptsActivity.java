@@ -235,15 +235,7 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
 
         try (FileWriter writer = new FileWriter(scriptFile)) {
             writer.write(script.getContent());
-
-            // Set file permissions to 644 (rw-r--r--)
-            try {
-                Runtime.getRuntime()
-                    .exec("chmod 644 " + scriptFile.getAbsolutePath())
-                    .waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            AccessibilityUtils.makeFileWorldReadable(scriptFile);
 
             Toast.makeText(this, "Script downloaded successfully", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {

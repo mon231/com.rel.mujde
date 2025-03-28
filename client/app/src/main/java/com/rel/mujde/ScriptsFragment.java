@@ -111,40 +111,15 @@ public class ScriptsFragment extends Fragment {
 
     private void loadScripts() {
         scriptsList.clear();
-        // TODO: cleanup, chmod
-        // Set directory permissions to 755 (rwxr-xr-x)
-        try {
-            Runtime.getRuntime()
-                .exec("chmod 755 " + ScriptUtils.getScriptsDirectoryPath(requireContext()))
-                .waitFor();
 
-            String dataDir = requireContext().getApplicationInfo().dataDir;
-            File prefsDir = new File(dataDir, "shared_prefs");
+        AccessibilityUtils.makeDirWorldReadable(ScriptUtils.getScriptsDirectory(requireContext()));
 
-            if (!prefsDir.exists()) {
-                prefsDir.mkdirs();
-            }
-
-            Runtime.getRuntime()
-                .exec("chmod 644 " + prefsDir.getAbsolutePath())
-                .waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         File[] files = ScriptUtils.getScripts(requireContext());
         if (files != null && files.length > 0) {
             for (File file : files) {
                 scriptsList.add(file.getName());
-
-                // Set file permissions to 644 (rw-r--r--)
-                try {
-                    Runtime.getRuntime()
-                        .exec("chmod 644 " + file.getAbsolutePath())
-                        .waitFor();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                AccessibilityUtils.makeFileWorldReadable(file);
             }
 
             emptyTextView.setVisibility(View.GONE);
@@ -202,18 +177,10 @@ public class ScriptsFragment extends Fragment {
                 writer.write(templateContent);
             }
 
-            // Set file permissions to 644 (rw-r--r--)
-            try {
-                Runtime.getRuntime()
-                    .exec("chmod 644 " + scriptFile.getAbsolutePath())
-                    .waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            AccessibilityUtils.makeFileWorldReadable(scriptFile);
             Toast.makeText(requireContext(), "Script created successfully", Toast.LENGTH_SHORT).show();
-            loadScripts(); // Refresh the list
 
+            loadScripts(); // Refresh the list
             openScriptEditor(fileName);
         } catch (IOException e) {
             Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -270,15 +237,7 @@ public class ScriptsFragment extends Fragment {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(scriptFile))) {
             writer.write(content);
 
-            try {
-                // TODO: note Set file permissions to 644 (rw-r--r--)
-                Runtime.getRuntime()
-                    .exec("chmod 644 " + scriptFile.getAbsolutePath())
-                    .waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            AccessibilityUtils.makeFileWorldReadable(scriptFile);
             Toast.makeText(requireContext(), "Script saved successfully", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Toast.makeText(requireContext(), "Error saving script: " + e.getMessage(), Toast.LENGTH_SHORT).show();

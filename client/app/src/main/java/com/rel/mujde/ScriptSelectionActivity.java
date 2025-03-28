@@ -145,14 +145,7 @@ public class ScriptSelectionActivity extends AppCompatActivity {
 
         for (File file : scriptFiles) {
             availableScripts.add(file.getName());
-
-            // TODO: use chmod util-cls
-            try {
-                Process chmod = Runtime.getRuntime().exec("chmod 777 " + file.getAbsolutePath());
-                chmod.waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            AccessibilityUtils.makeFileWorldReadable(file);
         }
     }
 }
