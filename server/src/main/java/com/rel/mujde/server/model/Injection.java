@@ -1,17 +1,13 @@
 package com.rel.mujde.server.model;
 
-/**
- * Represents the association between a Frida script and an Android application.
- */
+// TODO: rename to 'recommendetion' in db and in the code and server
 public class Injection {
     private int appId;
     private int scriptId;
-    private String packageName;  // Transient field for API use
-    private String scriptName;   // Transient field for API use
+    private String packageName;
+    private String scriptName;
 
-    public Injection() {
-        // Default constructor for JAX-RS
-    }
+    public Injection() { }
 
     public Injection(int appId, int scriptId) {
         this.appId = appId;
@@ -53,10 +49,10 @@ public class Injection {
     @Override
     public String toString() {
         return "Injection{" +
-                "appId=" + appId +
-                ", scriptId=" + scriptId +
-                ", packageName='" + packageName + '\'' +
-                ", scriptName='" + scriptName + '\'' +
-                '}';
+            "appId=" + appId +
+            ", scriptId=" + scriptId +
+            ", packageName='" + packageName + '\'' +
+            ", scriptName='" + scriptName + '\'' +
+            '}';
     }
 }

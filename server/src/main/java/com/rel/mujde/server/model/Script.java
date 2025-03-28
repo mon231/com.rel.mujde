@@ -2,9 +2,6 @@ package com.rel.mujde.server.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a Frida script.
- */
 public class Script {
     private int scriptId;
     private String scriptName;
@@ -13,9 +10,7 @@ public class Script {
     private LocalDateTime lastModified;
     private String content;  // Transient field, not stored in database
 
-    public Script() {
-        // Default constructor for JAX-RS
-    }
+    public Script() { }
 
     public Script(int scriptId, String scriptName, String scriptPath, String networkPath, LocalDateTime lastModified) {
         this.scriptId = scriptId;
@@ -76,11 +71,11 @@ public class Script {
     @Override
     public String toString() {
         return "Script{" +
-                "scriptId=" + scriptId +
-                ", scriptName='" + scriptName + '\'' +
-                ", scriptPath='" + scriptPath + '\'' +
-                ", networkPath='" + networkPath + '\'' +
-                ", lastModified=" + lastModified +
-                '}';
+            "scriptId=" + scriptId +
+            ", scriptName='" + scriptName + '\'' +
+            ", scriptPath='" + scriptPath + '\'' +
+            ", networkPath='" + networkPath + '\'' +
+            ", lastModified=" + lastModified +
+            '}';
     }
 }

@@ -30,8 +30,8 @@ public class App {
     @Override
     public String toString() {
         return "App{" +
-                " appId=" + appId +
-                ", packageName='" + packageName + "'" +
-                '}';
+            " appId=" + appId +
+            ", packageName='" + packageName + "'" +
+            '}';
     }
 }

@@ -1,17 +1,18 @@
 package com.rel.mujde.server.service;
 
-import com.rel.mujde.server.db.DatabaseManager;
 import com.rel.mujde.server.model.Script;
+import com.rel.mujde.server.db.DatabaseManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
 
 public class ScriptFileHandler {
     private final DatabaseManager dbManager;
@@ -19,9 +20,7 @@ public class ScriptFileHandler {
     private static final Logger logger = LoggerFactory.getLogger(ScriptFileHandler.class);
 
     public ScriptFileHandler() {
-        this.dbManager = DatabaseManager.getInstance();
-
-        // Ensure scripts directory exists
+        dbManager = DatabaseManager.getInstance();
         dbManager.getScriptsStorageDirectory();
     }
 
@@ -32,14 +31,13 @@ public class ScriptFileHandler {
 
     public String readScriptContent(String scriptPath) {
         try {
-            // Check if the scriptPath already contains the SCRIPTS_DIR prefix
             String fullPath;
             if (scriptPath.startsWith(SCRIPTS_DIR)) {
                 fullPath = scriptPath;
             } else {
                 fullPath = SCRIPTS_DIR + File.separator + scriptPath;
             }
-            
+
             logger.debug("Reading script content from path: {}", fullPath);
             return new String(Files.readAllBytes(Paths.get(fullPath)), StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -50,14 +48,13 @@ public class ScriptFileHandler {
 
     public void writeScriptContent(String scriptPath, String content) {
         try {
-            // Check if the scriptPath already contains the SCRIPTS_DIR prefix
             String fullPath;
             if (scriptPath.startsWith(SCRIPTS_DIR)) {
                 fullPath = scriptPath;
             } else {
                 fullPath = SCRIPTS_DIR + File.separator + scriptPath;
             }
-            
+
             logger.debug("Writing script content to path: {}", fullPath);
             Files.write(Paths.get(fullPath), content.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {

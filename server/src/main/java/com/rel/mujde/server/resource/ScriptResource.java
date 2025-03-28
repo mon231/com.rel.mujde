@@ -1,26 +1,29 @@
 package com.rel.mujde.server.resource;
 
+import com.rel.mujde.server.model.Script;
+import com.rel.mujde.server.db.DatabaseManager;
+import com.rel.mujde.server.service.ScriptFileHandler;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.rel.mujde.server.db.DatabaseManager;
-import com.rel.mujde.server.model.Script;
-import com.rel.mujde.server.service.ScriptFileHandler;
+
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Path("/scripts")
 @Produces(MediaType.APPLICATION_JSON)
 public class ScriptResource {
     private static final Logger logger = LoggerFactory.getLogger(ScriptResource.class);
     private static final ObjectMapper objectMapper;
-    
+
     static {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -28,7 +31,7 @@ public class ScriptResource {
         // Enable pretty printing for debugging
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
-    
+
     private final DatabaseManager dbManager;
     private final ScriptFileHandler scriptFileHandler;
 
@@ -171,8 +174,8 @@ public class ScriptResource {
         } catch (Exception e) {
             logger.error("Error updating script with ID: {}", scriptId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error updating script: " + e.getMessage())
-                    .build();
+                .entity("Error updating script: " + e.getMessage())
+                .build();
         }
     }
 
@@ -196,8 +199,8 @@ public class ScriptResource {
         } catch (Exception e) {
             logger.error("Error updating scripts", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error updating scripts: " + e.getMessage())
-                    .build();
+                .entity("Error updating scripts: " + e.getMessage())
+                .build();
         }
     }
 
@@ -209,8 +212,8 @@ public class ScriptResource {
 
             if (script == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Script with ID " + scriptId + " not found")
-                        .build();
+                    .entity("Script with ID " + scriptId + " not found")
+                    .build();
             }
 
             boolean fileDeleted = scriptFileHandler.deleteScriptFile(script.getScriptPath());
@@ -224,14 +227,14 @@ public class ScriptResource {
             } else {
                 logger.warn("Script {} wasn't deleted from DB", script.getScriptName());
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("Failed to delete script from database")
-                        .build();
+                    .entity("Failed to delete script from database")
+                    .build();
             }
         } catch (Exception e) {
             logger.error("Error deleting script with ID: {}", scriptId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error deleting script: " + e.getMessage())
-                    .build();
+                .entity("Error deleting script: " + e.getMessage())
+                .build();
         }
     }
 }

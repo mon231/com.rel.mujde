@@ -1,20 +1,18 @@
 package com.rel.mujde.server.db;
 
 import com.rel.mujde.server.model.App;
-import com.rel.mujde.server.model.Injection;
 import com.rel.mujde.server.model.Script;
+import com.rel.mujde.server.model.Injection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.io.File;
 import java.util.List;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
 
-/**
- * Manages interactions with the SQLite database.
- */
 public class DatabaseManager {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
     private static final String DB_URL = "jdbc:sqlite:mujde.db";

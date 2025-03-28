@@ -4,17 +4,15 @@ import com.rel.mujde.server.db.DatabaseManager;
 import com.rel.mujde.server.model.App;
 import com.rel.mujde.server.model.Injection;
 import com.rel.mujde.server.model.Script;
+
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
-/**
- * RESTful resource for managing script injections into applications.
- */
 @Path("/injections")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -26,9 +24,6 @@ public class InjectionResource {
         this.dbManager = DatabaseManager.getInstance();
     }
 
-    /**
-     * Gets all scripts to inject into a specific application.
-     */
     @GET
     @Path("/by_app/{package_name}")
     public Response getInjectionsByApp(@PathParam("package_name") String packageName) {
@@ -36,8 +31,8 @@ public class InjectionResource {
             App app = dbManager.getAppByPackageName(packageName);
             if (app == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Application with package name '" + packageName + "' not found")
-                        .build();
+                    .entity("Application with package name '" + packageName + "' not found")
+                    .build();
             }
 
             List<Injection> injections = dbManager.getInjectionsByApp(packageName);
@@ -50,9 +45,6 @@ public class InjectionResource {
         }
     }
 
-    /**
-     * Gets all applications that a specific script should be injected into.
-     */
     @GET
     @Path("/by_script/{script_name}")
     public Response getInjectionsByScript(@PathParam("script_name") String scriptName) {
@@ -60,8 +52,8 @@ public class InjectionResource {
             Script script = dbManager.getScriptByName(scriptName);
             if (script == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Script with name '" + scriptName + "' not found")
-                        .build();
+                    .entity("Script with name '" + scriptName + "' not found")
+                    .build();
             }
 
             List<Injection> injections = dbManager.getInjectionsByScript(scriptName);
@@ -69,49 +61,43 @@ public class InjectionResource {
         } catch (Exception e) {
             logger.error("Error retrieving injections for script: {}", scriptName, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error retrieving injections: " + e.getMessage())
-                    .build();
+                .entity("Error retrieving injections: " + e.getMessage())
+                .build();
         }
     }
 
-    /**
-     * Associates a script with an application for injection.
-     */
     @POST
     public Response addInjection(Injection injection) {
         try {
             if (injection.getPackageName() == null || injection.getPackageName().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Package name is required")
-                        .build();
+                    .entity("Package name is required")
+                    .build();
             }
 
             if (injection.getScriptName() == null || injection.getScriptName().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Script name is required")
-                        .build();
+                    .entity("Script name is required")
+                    .build();
             }
 
-            // Get app and script by their names
             App app = dbManager.getAppByPackageName(injection.getPackageName());
             if (app == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Application with package name '" + injection.getPackageName() + "' not found")
-                        .build();
+                    .entity("Application with package name '" + injection.getPackageName() + "' not found")
+                    .build();
             }
 
             Script script = dbManager.getScriptByName(injection.getScriptName());
             if (script == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Script with name '" + injection.getScriptName() + "' not found")
-                        .build();
+                    .entity("Script with name '" + injection.getScriptName() + "' not found")
+                    .build();
             }
 
-            // Set IDs for the injection
             injection.setAppId(app.getAppId());
             injection.setScriptId(script.getScriptId());
 
-            // Add the injection
             boolean added = dbManager.addInjection(injection);
             if (added) {
                 return Response.status(Response.Status.CREATED)

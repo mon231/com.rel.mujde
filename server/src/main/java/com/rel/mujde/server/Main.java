@@ -5,15 +5,15 @@ import com.rel.mujde.server.resource.InjectionResource;
 import com.rel.mujde.server.resource.ScriptResource;
 import com.rel.mujde.server.serializer.JacksonConfig;
 
+import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
-import jakarta.ws.rs.core.UriBuilder;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
+import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.net.URI;
+import jakarta.ws.rs.core.UriBuilder;
 
 public class Main {
     private static final int DEFAULT_PORT = 8080;
@@ -24,15 +24,20 @@ public class Main {
         int port = DEFAULT_PORT;
         String interfaceAddress = ALL_INTERFACES;
 
+        boolean portSpecified = false;
+        boolean hostSpecified = false;
+
         for (int i = 0; i < args.length; i++) {
-            if ("-p".equals(args[i]) || "--port".equals(args[i])) {
+            if ("--port".equals(args[i]) && !portSpecified) {
                 if (i + 1 < args.length) {
                     port = Integer.parseInt(args[i + 1]);
+                    portSpecified = true;
                     i++;
                 }
-            } else if ("-i".equals(args[i]) || "--interface-address".equals(args[i])) {
+            } else if ("--host".equals(args[i]) && !hostSpecified) {
                 if (i + 1 < args.length) {
                     interfaceAddress = args[i + 1];
+                    hostSpecified = true;
                     i++;
                 }
             }
@@ -43,20 +48,20 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            URI serverBindings = getServerBindings(args);
             ResourceConfig config = new ResourceConfig();
 
-            // Register Jackson for JSON serialization
+            // NOTE register Jackson for JSON serialization
             config.register(JacksonConfig.class);
             config.register(JacksonFeature.class);
             config.register(JacksonJaxbJsonProvider.class);
             config.packages("com.rel.mujde.server");
-            
-            // Register resources
+
+            // NOTE register resource classes for the server
             config.register(AppResource.class);
             config.register(ScriptResource.class);
             config.register(InjectionResource.class);
 
+            URI serverBindings = getServerBindings(args);
             GrizzlyHttpServerFactory.createHttpServer(serverBindings, config);
 
             logger.info("Mujde Server started at {}", serverBindings);

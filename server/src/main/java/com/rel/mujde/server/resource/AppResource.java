@@ -29,8 +29,8 @@ public class AppResource {
         } catch (Exception e) {
             logger.error("Error retrieving all apps", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error retrieving applications: " + e.getMessage())
-                    .build();
+                .entity("Error retrieving applications: " + e.getMessage())
+                .build();
         }
     }
 
@@ -39,26 +39,26 @@ public class AppResource {
         try {
             if (app.getPackageName() == null || app.getPackageName().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Package name is required")
-                        .build();
+                    .entity("Package name is required")
+                    .build();
             }
 
             App existingApp = dbManager.getAppByPackageName(app.getPackageName());
             if (existingApp != null) {
                 return Response.status(Response.Status.CONFLICT)
-                        .entity("An application with package name '" + app.getPackageName() + "' already exists")
-                        .build();
+                    .entity("An application with package name '" + app.getPackageName() + "' already exists")
+                    .build();
             }
 
             App addedApp = dbManager.addApp(app);
             return Response.status(Response.Status.CREATED)
-                    .entity(addedApp)
-                    .build();
+                .entity(addedApp)
+                .build();
         } catch (Exception e) {
             logger.error("Error adding app: {}", app, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error adding application: " + e.getMessage())
-                    .build();
+                .entity("Error adding application: " + e.getMessage())
+                .build();
         }
     }
 
@@ -70,16 +70,16 @@ public class AppResource {
 
             if (app == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Application with ID " + appId + " not found")
-                        .build();
+                    .entity("Application with ID " + appId + " not found")
+                    .build();
             }
 
             return Response.ok(app).build();
         } catch (Exception e) {
             logger.error("Error getting app by ID: {}", appId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error retrieving application: " + e.getMessage())
-                    .build();
+                .entity("Error retrieving application: " + e.getMessage())
+                .build();
         }
     }
 
@@ -90,8 +90,8 @@ public class AppResource {
             App app = dbManager.getAppById(appId);
             if (app == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Application with ID " + appId + " not found")
-                        .build();
+                    .entity("Application with ID " + appId + " not found")
+                    .build();
             }
 
             boolean deleted = dbManager.deleteApp(appId);
@@ -99,14 +99,14 @@ public class AppResource {
                 return Response.status(Response.Status.NO_CONTENT).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("Failed to delete application")
-                        .build();
+                    .entity("Failed to delete application")
+                    .build();
             }
         } catch (Exception e) {
             logger.error("Error deleting app with ID: {}", appId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error deleting application: " + e.getMessage())
-                    .build();
+                .entity("Error deleting application: " + e.getMessage())
+                .build();
         }
     }
 }
