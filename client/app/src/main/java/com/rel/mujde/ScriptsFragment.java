@@ -109,29 +109,25 @@ public class ScriptsFragment extends Fragment {
         loadScripts();
     }
 
-    // Removed options menu methods as we're only using the FAB for adding scripts
-
     private void loadScripts() {
         scriptsList.clear();
         // TODO: cleanup, chmod
         // Set directory permissions to 755 (rwxr-xr-x)
         try {
-            Process chmod = Runtime.getRuntime().exec("chmod 777 " + ScriptUtils.getScriptsDirectoryPath(requireContext()));
-            chmod.waitFor();
+            Runtime.getRuntime()
+                .exec("chmod 755 " + ScriptUtils.getScriptsDirectoryPath(requireContext()))
+                .waitFor();
 
-            // Also make the shared_prefs directory readable
-            File prefsDir = new File(requireContext().getApplicationInfo().dataDir, "shared_prefs");
-            if (prefsDir.exists()) {
-                Process chmodPrefs = Runtime.getRuntime().exec("chmod 777 " + prefsDir.getAbsolutePath());
-                chmodPrefs.waitFor();
+            String dataDir = requireContext().getApplicationInfo().dataDir;
+            File prefsDir = new File(dataDir, "shared_prefs");
 
-                // Make the script_contents.xml file readable if it exists
-                File prefsFile = new File(prefsDir, "script_contents.xml");
-                if (prefsFile.exists()) {
-                    Process chmodPrefsFile = Runtime.getRuntime().exec("chmod 777 " + prefsFile.getAbsolutePath());
-                    chmodPrefsFile.waitFor();
-                }
+            if (!prefsDir.exists()) {
+                prefsDir.mkdirs();
             }
+
+            Runtime.getRuntime()
+                .exec("chmod 644 " + prefsDir.getAbsolutePath())
+                .waitFor();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -143,8 +139,9 @@ public class ScriptsFragment extends Fragment {
 
                 // Set file permissions to 644 (rw-r--r--)
                 try {
-                    Process chmod = Runtime.getRuntime().exec("chmod 777 " + file.getAbsolutePath());
-                    chmod.waitFor();
+                    Runtime.getRuntime()
+                        .exec("chmod 644 " + file.getAbsolutePath())
+                        .waitFor();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -164,17 +161,14 @@ public class ScriptsFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Create New Script");
 
-        // Set up the input field
         final EditText input = new EditText(requireContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.setHint("script_name.js");
+        input.setHint("script_name" + Constants.SCRIPT_FILE_EXT);
         builder.setView(input);
 
-        // Set up the buttons
         builder.setPositiveButton("Create", (dialog, which) -> {
             String fileName = input.getText().toString().trim();
 
-            // Validate the file name
             if (fileName.isEmpty()) {
                 Toast.makeText(requireContext(), "File name cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
@@ -191,60 +185,36 @@ public class ScriptsFragment extends Fragment {
     private void createNewScript(String fileName) {
         File scriptFile = ScriptUtils.getScriptFile(requireContext(), fileName);
 
-        // Check if file already exists
         if (scriptFile.exists()) {
-            Toast.makeText(requireContext(), "A script with this name already exists", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(),
+                "A script with this name already exists", Toast.LENGTH_SHORT).show();
             return;
         }
 
         try {
-            // Create the file
-            if (scriptFile.createNewFile()) {
-                // Create template content
-                String templateContent = "// JavaScript Script\n// Created: " +
-                        java.text.DateFormat.getDateTimeInstance().format(new java.util.Date()) +
-                        "\n\n// Your code here\n";
-
-                // Write to the file
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(scriptFile))) {
-                    writer.write(templateContent);
-                }
-
-                // Set file permissions to 644 (rw-r--r--)
-                try {
-                    Process chmod = Runtime.getRuntime().exec("chmod 777 " + scriptFile.getAbsolutePath());
-                    chmod.waitFor();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // Also save to SharedPreferences for Xposed module access
-                try {
-                    // Save to SharedPreferences with mode MODE_WORLD_READABLE
-                    SharedPreferences scriptPrefs = requireContext().getSharedPreferences("script_contents", Context.MODE_WORLD_READABLE);
-                    SharedPreferences.Editor editor = scriptPrefs.edit();
-                    editor.putString(fileName, templateContent);
-                    editor.apply();
-
-                    // Make the SharedPreferences file world-readable
-                    File prefsDir = new File(requireContext().getApplicationInfo().dataDir, "shared_prefs");
-                    File prefsFile = new File(prefsDir, "script_contents.xml");
-                    if (prefsFile.exists()) {
-                        Process chmodPrefs = Runtime.getRuntime().exec("chmod 777 " + prefsFile.getAbsolutePath());
-                        chmodPrefs.waitFor();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                Toast.makeText(requireContext(), "Script created successfully", Toast.LENGTH_SHORT).show();
-                loadScripts(); // Refresh the list
-
-                // Open the new script for editing
-                openScriptEditor(fileName);
-            } else {
+            if (!scriptFile.createNewFile()) {
                 Toast.makeText(requireContext(), "Failed to create script", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            String templateContent = "// My cool frida script\n";
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(scriptFile))) {
+                writer.write(templateContent);
+            }
+
+            // Set file permissions to 644 (rw-r--r--)
+            try {
+                Runtime.getRuntime()
+                    .exec("chmod 644 " + scriptFile.getAbsolutePath())
+                    .waitFor();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Toast.makeText(requireContext(), "Script created successfully", Toast.LENGTH_SHORT).show();
+            loadScripts(); // Refresh the list
+
+            openScriptEditor(fileName);
         } catch (IOException e) {
             Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -278,12 +248,11 @@ public class ScriptsFragment extends Fragment {
         final EditText input = new EditText(requireContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         input.setText(content.toString());
+        input.setTextDirection(View.TEXT_DIRECTION_LTR);
         input.setMinLines(10);
-        // TODO: set left-to-right text direction
         input.setMaxLines(20);
         builder.setView(input);
 
-        // Set up the buttons
         builder.setPositiveButton("Save", (dialog, which) -> {
             String newContent = input.getText().toString();
             saveScript(scriptName, newContent);
@@ -301,29 +270,11 @@ public class ScriptsFragment extends Fragment {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(scriptFile))) {
             writer.write(content);
 
-            // TODO: ??? Set file permissions to 644 (rw-r--r--)
             try {
-                Process chmod = Runtime.getRuntime().exec("chmod 777 " + scriptFile.getAbsolutePath());
-                chmod.waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // Also save the script content to SharedPreferences for Xposed module access
-            try {
-                // Save to SharedPreferences with mode MODE_WORLD_READABLE
-                SharedPreferences scriptPrefs = requireContext().getSharedPreferences("script_contents", Context.MODE_WORLD_READABLE);
-                SharedPreferences.Editor editor = scriptPrefs.edit();
-                editor.putString(scriptName, content);
-                editor.apply();
-
-                // Make the SharedPreferences file world-readable
-                File prefsDir = new File(requireContext().getApplicationInfo().dataDir, "shared_prefs");
-                File prefsFile = new File(prefsDir, "script_contents.xml");
-                if (prefsFile.exists()) {
-                    Process chmodPrefs = Runtime.getRuntime().exec("chmod 777 " + prefsFile.getAbsolutePath());
-                    chmodPrefs.waitFor();
-                }
+                // TODO: note Set file permissions to 644 (rw-r--r--)
+                Runtime.getRuntime()
+                    .exec("chmod 644 " + scriptFile.getAbsolutePath())
+                    .waitFor();
             } catch (Exception e) {
                 e.printStackTrace();
             }

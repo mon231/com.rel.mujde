@@ -238,28 +238,9 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
 
             // Set file permissions to 644 (rw-r--r--)
             try {
-                Process chmod = Runtime.getRuntime().exec("chmod 777 " + scriptFile.getAbsolutePath());
-                chmod.waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // Also save to SharedPreferences for Xposed module access
-            try {
-                // Save to SharedPreferences with mode MODE_WORLD_READABLE
-                android.content.SharedPreferences scriptPrefs = getSharedPreferences("script_contents", Context.MODE_WORLD_READABLE);
-                android.content.SharedPreferences.Editor editor = scriptPrefs.edit();
-                editor.putString(scriptName, script.getContent());
-                editor.apply();
-
-                // TODO: remove this ??
-                // Make the SharedPreferences file world-readable
-                File prefsDir = new File(getApplicationInfo().dataDir, "shared_prefs");
-                File prefsFile = new File(prefsDir, "script_contents.xml");
-                if (prefsFile.exists()) {
-                    Process chmodPrefs = Runtime.getRuntime().exec("chmod 777 " + prefsFile.getAbsolutePath());
-                    chmodPrefs.waitFor();
-                }
+                Runtime.getRuntime()
+                    .exec("chmod 644 " + scriptFile.getAbsolutePath())
+                    .waitFor();
             } catch (Exception e) {
                 e.printStackTrace();
             }
