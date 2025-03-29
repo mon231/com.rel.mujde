@@ -1,13 +1,62 @@
-NOTE you can view/add files to /data/data/com.rel.mujde/files/scripts
-NOTE what each class / service do
-NOTE how apps communicate to service
+# Mujde app
+Mujde is an android app in form of Xposed module, that integrates with Xposed framework to hook apps. <br />
+Mujde lets the user manage repository (local and remote) of frida-js scripts, and select what script should it inject to which selected application. <br />
+Using android's SharedPreferences, mujde stores a map between apps to the list of scripts it should inject into them. <br />
+Using Xposed's XSharedPreferences, mujde's hook (`InjectionRequester` cls) is accessible to that mapping.
 
-Xposed shared pref: /data/misc/eb08c078-3e01-43a8-8857-4e57e0f0e2e3/prefs/com.rel.mujde/mujde_prefs.xml
-code-notes with `// NOTE` made to explain non-trivial behavior. other `//` comments are simpler
+Via Xposed framework, mujde gets a callback (`handleLoadPackage`) whenever an app is loaded by zygote-forkAndSpeciallize. <br />
+Then, mujde fetches the list of scripts it should inject to that app (using `XSharedPreferences`). <br />
+If that list isn't empty, mujde (`installHookOnActivityCreation`) installs hook on `Activity.onCreate` function, <br />
+Which lets us get a callback whenever a new activity is started in that app (which we already know that has scripts the user wants to inject into). <br />
+Then, from that hook, mujde sends an injection-request from the app's context to mujde's broadcast-listener named `InjectionRequestHandler`. <br />
+That handler sends the injection-request to mujde's injection service (`FridaInjectorService`) via intent, <br />
+And the service creates `frida-inject` subprocesses (as root user) to inject the selected scripts into the started app. <br />
+NOTE that the scripts will be re-injected whenever the app creates/re-creates any activity.
 
-TODO: write, impl, cont
+Mujde manages the local scripts repository in the app-data folder's `files` subfolder. <br />
+Users with root permissions can create/remove/edit files from that folder directly, <br />
+Without using mujde's app to manage the repository: `/data/data/com.rel.mujde/files/scripts` <br />
+This feature is extremly usable for scripts / massive management operations on the repository.
 
-## Classes
+Additional, mujde's shared-preferences are stored at Xposed-shared-preferences folder to be world-readable. <br />
+Root users can edit the shared-preferences from there to import settings from other devices, <br />
+And any user can read the contents of that folder and files. Mujde's main shared-pref can be found at `/data/misc/eb08c078-3e01-43a8-8857-4e57e0f0e2e3/prefs/com.rel.mujde/mujde_prefs.xml`. <br />
+NOTE that this path might have a different guid on different android devices / between reboots.
+
+## Compile The App
+Use this guide to compile the app by yourself (or simply download the build artifacts from github-action or releases) <br />
+NOTE you can compile the app using windows / linux / macos
+
+### Requirements
+- git client
+- java setup (e.g. java-temurin v21) and android-sdk
+- java-home (env. variable ANDROID_HOME) or local.properties set correctly with `sdk.dir`
+- internet connection (in order to download `frida-inject` binaries from frida's github releases)
+- python3 + pip + `pip install signapp buildapp && buildapp_fetch_tools`
+    * optional, only made for release builds
+
+### Build steps
+Clone the project:
+```bash
+git clone https://github.com/mon231/com.rel.mujde mujde
+```
+
+Execute gradlew:
+```bash
+cd mujde/client
+./gradlew assembleDebug
+```
+
+Find the apk at `mujde/client/app/build/outputs/apk/debug/app-debug.apk`
+In order to build the app for release compilations:
+```bash
+./gradlew assembleRelease
+signapp -a mujde/client/app/build/outputs/apk/release/app-release.apk -o app-signed.apk
+```
+
+Find the apk (release build) at `app-signed.apk`
+
+## Code Classes
 
 ### Fragments
 ScriptsFragment: show the scripts page from navbar. let the user watch existing scripts, create new, edit, delete, ...
