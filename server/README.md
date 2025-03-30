@@ -1,17 +1,20 @@
 # Mujde Project - Server Side
 
 ## Overview
-The server-side component of the Mujde project is a RESTful Java application that wraps an SQLite database and provides an HTTP API for managing Frida scripts and their association with Android applications. It enables users to store, retrieve, and update script configurations remotely.
+The Mujde Project server is a RESTful Java application that wraps an SQLite database and provides an HTTP API for managing Frida scripts and their association with Android applications. It enables users to store, retrieve, and update script configurations remotely.
 
 ## Features
 - **RESTful API**: Built using JAX-RS to handle HTTP requests.
-- **SQLite Database**: Stores information about scripts and their associations with Android applications.
+- **SQLite Database**: Stores information about scripts, their metadata.
 - **Script Management**:
   - Store and retrieve Frida scripts.
   - Update scripts sourced from the internet.
   - Associate scripts with installed applications.
+-**Remote Script Updates:**
+  - scripts can be updated from external URLs (network path). 
 - **Backup and Restore**:
-  - the server stores the scripts uploaded by the clients, in a unique folder at "./stored_scripts/" from server's cwd. if the folder didn't exist previously, the server creates it.
+  - the server stores the scripts uploaded by the clients, in a unique folder at "./stored_scripts/" from server's cwd.
+  -  if the folder didn't exist previously, the server creates it.
 
 ## API Endpoints
 ### Application Management
@@ -61,6 +64,7 @@ NOTE that app-id is the package name, e.g. `com.tranzmate`
 ### Prerequisites
 - Java Development Kit (JDK) 11 or later
 - Apache Maven
+- SQLite
 
 ### Build Instructions
 1. Clone the repository:
