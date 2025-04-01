@@ -2,7 +2,7 @@ package com.rel.mujde.server.db;
 
 import com.rel.mujde.server.model.App;
 import com.rel.mujde.server.model.Script;
-import com.rel.mujde.server.model.Injection;
+import com.rel.mujde.server.model.Recommendation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class DatabaseManager {
             );
 
             stmt.execute(
-                "CREATE TABLE IF NOT EXISTS Injections (" +
+                "CREATE TABLE IF NOT EXISTS Recommendation (" +
                     "app_id INTEGER," +
                     "script_id INTEGER," +
                     "PRIMARY KEY (app_id, script_id)," +
@@ -335,37 +335,38 @@ public class DatabaseManager {
         }
     }
 
-    public List<Injection> getAllInjections() {
-        List<Injection> injections = new ArrayList<>();
+    public List<Recommendation> getAllRecommendations() {
+        List<Recommendation> recommendations = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(
                      "SELECT i.app_id, i.script_id, a.package_name, s.script_name " +
-                     "FROM Injections i " +
+                     "FROM Recommendation i " +
                      "JOIN Apps a ON i.app_id = a.app_id " +
                      "JOIN Scripts s ON i.script_id = s.script_id")) {
 
             while (rs.next()) {
-                Injection injection = new Injection(rs.getInt("app_id"), rs.getInt("script_id"));
-                injection.setPackageName(rs.getString("package_name"));
-                injection.setScriptName(rs.getString("script_name"));
-                injections.add(injection);
+                Recommendation recommendation = new Recommendation(rs.getInt("app_id"), rs.getInt("script_id"));
+                recommendation.setPackageName(rs.getString("package_name"));
+                recommendation.setScriptName(rs.getString("script_name"));
+                recommendations.add(recommendation);
             }
         } catch (SQLException e) {
-            logger.error("Error getting all injections", e);
-            throw new RuntimeException("Error getting all injections", e);
+            logger.error("Error getting all recommendations", e);
+            throw new RuntimeException("Error getting all recommendations", e);
         }
 
-        return injections;
+        return recommendations;
     }
 
-    public List<Injection> getInjectionsByApp(String packageName) {
-        List<Injection> injections = new ArrayList<>();
+    public List<Recommendation> getRecommendationsByApp(String packageName) {
+        List<Recommendation> recommendations = new ArrayList<>();
+
         try (
             Connection conn = DriverManager.getConnection(DB_URL);
             PreparedStatement stmt = conn.prepareStatement(
                      "SELECT i.app_id, i.script_id, a.package_name, s.script_name " +
-                     "FROM Injections i " +
+                     "FROM Recommendations i " +
                      "JOIN Apps a ON i.app_id = a.app_id " +
                      "JOIN Scripts s ON i.script_id = s.script_id " +
                      "WHERE a.package_name = ?")) {
@@ -373,26 +374,26 @@ public class DatabaseManager {
             stmt.setString(1, packageName);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Injection injection = new Injection(rs.getInt("app_id"), rs.getInt("script_id"));
-                    injection.setPackageName(rs.getString("package_name"));
-                    injection.setScriptName(rs.getString("script_name"));
-                    injections.add(injection);
+                    Recommendation recommendation = new Recommendation(rs.getInt("app_id"), rs.getInt("script_id"));
+                    recommendation.setPackageName(rs.getString("package_name"));
+                    recommendation.setScriptName(rs.getString("script_name"));
+                    recommendations.add(recommendation);
                 }
             }
         } catch (SQLException e) {
-            logger.error("Error getting injections by app: {}", packageName, e);
-            throw new RuntimeException("Error getting injections by app", e);
+            logger.error("Error getting recommendations by app: {}", packageName, e);
+            throw new RuntimeException("Error getting recommendations by app", e);
         }
 
-        return injections;
+        return recommendations;
     }
 
-    public List<Injection> getInjectionsByScript(String scriptName) {
-        List<Injection> injections = new ArrayList<>();
+    public List<Recommendation> getRecommendationsByScript(String scriptName) {
+        List<Recommendation> recommendations = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT i.app_id, i.script_id, a.package_name, s.script_name " +
-                     "FROM Injections i " +
+                     "FROM Recommendations i " +
                      "JOIN Apps a ON i.app_id = a.app_id " +
                      "JOIN Scripts s ON i.script_id = s.script_id " +
                      "WHERE s.script_name = ?")) {
@@ -400,42 +401,42 @@ public class DatabaseManager {
             stmt.setString(1, scriptName);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Injection injection = new Injection(rs.getInt("app_id"), rs.getInt("script_id"));
-                    injection.setPackageName(rs.getString("package_name"));
-                    injection.setScriptName(rs.getString("script_name"));
-                    injections.add(injection);
+                    Recommendation recommendation = new Recommendation(rs.getInt("app_id"), rs.getInt("script_id"));
+                    recommendation.setPackageName(rs.getString("package_name"));
+                    recommendation.setScriptName(rs.getString("script_name"));
+                    recommendations.add(recommendation);
                 }
             }
         } catch (SQLException e) {
-            logger.error("Error getting injections by script: {}", scriptName, e);
-            throw new RuntimeException("Error getting injections by script", e);
+            logger.error("Error getting recommendations by script: {}", scriptName, e);
+            throw new RuntimeException("Error getting recommendations by script", e);
         }
 
-        return injections;
+        return recommendations;
     }
 
-    public boolean addInjection(Injection injection) {
+    public boolean addRecommendation(Recommendation recommendation) {
         try (
             Connection conn = DriverManager.getConnection(DB_URL);
             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO Injections (app_id, script_id) VALUES (?, ?)")) {
+                     "INSERT INTO Recommendation (app_id, script_id) VALUES (?, ?)")) {
 
-            stmt.setInt(1, injection.getAppId());
-            stmt.setInt(2, injection.getScriptId());
+            stmt.setInt(1, recommendation.getAppId());
+            stmt.setInt(2, recommendation.getScriptId());
 
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            logger.error("Error adding injection: {}", injection, e);
-            throw new RuntimeException("Error adding injection", e);
+            logger.error("Error adding recommendation: {}", recommendation, e);
+            throw new RuntimeException("Error adding recommendation", e);
         }
     }
 
-    public boolean deleteInjection(int appId, int scriptId) {
+    public boolean deleteRecommendation(int appId, int scriptId) {
         try (
             Connection conn = DriverManager.getConnection(DB_URL);
             PreparedStatement stmt = conn.prepareStatement(
-                     "DELETE FROM Injections WHERE app_id = ? AND script_id = ?")) {
+                     "DELETE FROM Recommendations WHERE app_id = ? AND script_id = ?")) {
 
             stmt.setInt(1, appId);
             stmt.setInt(2, scriptId);
@@ -443,8 +444,8 @@ public class DatabaseManager {
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            logger.error("Error deleting injection for app ID: {} and script ID: {}", appId, scriptId, e);
-            throw new RuntimeException("Error deleting injection", e);
+            logger.error("Error deleting recommendation for app ID: {} and script ID: {}", appId, scriptId, e);
+            throw new RuntimeException("Error deleting recommendation", e);
         }
     }
 }

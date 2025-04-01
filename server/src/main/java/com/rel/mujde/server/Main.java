@@ -1,7 +1,7 @@
 package com.rel.mujde.server;
 
 import com.rel.mujde.server.resource.AppResource;
-import com.rel.mujde.server.resource.InjectionResource;
+import com.rel.mujde.server.resource.RecommendationResource;
 import com.rel.mujde.server.resource.ScriptResource;
 import com.rel.mujde.server.serializer.JacksonConfig;
 
@@ -59,7 +59,7 @@ public class Main {
             // NOTE register resource classes for the server
             config.register(AppResource.class);
             config.register(ScriptResource.class);
-            config.register(InjectionResource.class);
+            config.register(RecommendationResource.class);
 
             URI serverBindings = getServerBindings(args);
             GrizzlyHttpServerFactory.createHttpServer(serverBindings, config);

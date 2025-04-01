@@ -2,7 +2,7 @@ package com.rel.mujde.server.resource;
 
 import com.rel.mujde.server.db.DatabaseManager;
 import com.rel.mujde.server.model.App;
-import com.rel.mujde.server.model.Injection;
+import com.rel.mujde.server.model.Recommendation;
 import com.rel.mujde.server.model.Script;
 
 import jakarta.ws.rs.*;
@@ -13,20 +13,20 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
-@Path("/injections")
+@Path("/recommendations")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class InjectionResource {
-    private static final Logger logger = LoggerFactory.getLogger(InjectionResource.class);
+public class RecommendationResource {
+    private static final Logger logger = LoggerFactory.getLogger(RecommendationResource.class);
     private final DatabaseManager dbManager;
 
-    public InjectionResource() {
+    public RecommendationResource() {
         this.dbManager = DatabaseManager.getInstance();
     }
 
     @GET
     @Path("/by_app/{package_name}")
-    public Response getInjectionsByApp(@PathParam("package_name") String packageName) {
+    public Response getRecommendationsByApp(@PathParam("package_name") String packageName) {
         try {
             App app = dbManager.getAppByPackageName(packageName);
             if (app == null) {
@@ -35,19 +35,19 @@ public class InjectionResource {
                     .build();
             }
 
-            List<Injection> injections = dbManager.getInjectionsByApp(packageName);
-            return Response.ok(injections).build();
+            List<Recommendation> recommendations = dbManager.getRecommendationsByApp(packageName);
+            return Response.ok(recommendations).build();
         } catch (Exception e) {
-            logger.error("Error retrieving injections for app: {}", packageName, e);
+            logger.error("Error retrieving recommendations for app: {}", packageName, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error retrieving injections: " + e.getMessage())
+                    .entity("Error retrieving recommendations: " + e.getMessage())
                     .build();
         }
     }
 
     @GET
     @Path("/by_script/{script_name}")
-    public Response getInjectionsByScript(@PathParam("script_name") String scriptName) {
+    public Response getRecommendationsByScript(@PathParam("script_name") String scriptName) {
         try {
             Script script = dbManager.getScriptByName(scriptName);
             if (script == null) {
@@ -56,52 +56,52 @@ public class InjectionResource {
                     .build();
             }
 
-            List<Injection> injections = dbManager.getInjectionsByScript(scriptName);
-            return Response.ok(injections).build();
+            List<Recommendation> recommendations = dbManager.getRecommendationsByScript(scriptName);
+            return Response.ok(recommendations).build();
         } catch (Exception e) {
-            logger.error("Error retrieving injections for script: {}", scriptName, e);
+            logger.error("Error retrieving recommendations for script: {}", scriptName, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Error retrieving injections: " + e.getMessage())
+                .entity("Error retrieving recommendations: " + e.getMessage())
                 .build();
         }
     }
 
     @POST
-    public Response addInjection(Injection injection) {
+    public Response addRecommendation(Recommendation recommendation) {
         try {
-            if (injection.getPackageName() == null || injection.getPackageName().isEmpty()) {
+            if (recommendation.getPackageName() == null || recommendation.getPackageName().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Package name is required")
                     .build();
             }
 
-            if (injection.getScriptName() == null || injection.getScriptName().isEmpty()) {
+            if (recommendation.getScriptName() == null || recommendation.getScriptName().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Script name is required")
                     .build();
             }
 
-            App app = dbManager.getAppByPackageName(injection.getPackageName());
+            App app = dbManager.getAppByPackageName(recommendation.getPackageName());
             if (app == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Application with package name '" + injection.getPackageName() + "' not found")
+                    .entity("Application with package name '" + recommendation.getPackageName() + "' not found")
                     .build();
             }
 
-            Script script = dbManager.getScriptByName(injection.getScriptName());
+            Script script = dbManager.getScriptByName(recommendation.getScriptName());
             if (script == null) {
                 return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Script with name '" + injection.getScriptName() + "' not found")
+                    .entity("Script with name '" + recommendation.getScriptName() + "' not found")
                     .build();
             }
 
-            injection.setAppId(app.getAppId());
-            injection.setScriptId(script.getScriptId());
+            recommendation.setAppId(app.getAppId());
+            recommendation.setScriptId(script.getScriptId());
 
-            boolean added = dbManager.addInjection(injection);
+            boolean added = dbManager.addRecommendation(recommendation);
             if (added) {
                 return Response.status(Response.Status.CREATED)
-                        .entity(injection)
+                        .entity(recommendation)
                         .build();
             } else {
                 return Response.status(Response.Status.CONFLICT)
@@ -109,9 +109,9 @@ public class InjectionResource {
                         .build();
             }
         } catch (Exception e) {
-            logger.error("Error adding injection: {}", injection, e);
+            logger.error("Error adding recommendation: {}", recommendation, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error adding injection: " + e.getMessage())
+                    .entity("Error adding recommendation: " + e.getMessage())
                     .build();
         }
     }
@@ -121,7 +121,7 @@ public class InjectionResource {
      */
     @DELETE
     @Path("/{package_name}/{script_name}")
-    public Response deleteInjection(
+    public Response deleteRecommendation(
             @PathParam("package_name") String packageName,
             @PathParam("script_name") String scriptName) {
         try {
@@ -139,18 +139,18 @@ public class InjectionResource {
                         .build();
             }
 
-            boolean deleted = dbManager.deleteInjection(app.getAppId(), script.getScriptId());
+            boolean deleted = dbManager.deleteRecommendation(app.getAppId(), script.getScriptId());
             if (deleted) {
                 return Response.status(Response.Status.NO_CONTENT).build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity("No injection found for this application and script")
+                        .entity("No recommendation found for this application and script")
                         .build();
             }
         } catch (Exception e) {
-            logger.error("Error deleting injection for app: {} and script: {}", packageName, scriptName, e);
+            logger.error("Error deleting recommendation for app: {} and script: {}", packageName, scriptName, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error deleting injection: " + e.getMessage())
+                    .entity("Error deleting recommendation: " + e.getMessage())
                     .build();
         }
     }

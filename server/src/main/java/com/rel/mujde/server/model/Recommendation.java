@@ -1,15 +1,15 @@
 package com.rel.mujde.server.model;
 
 // TODO: rename to 'recommendetion' in db and in the code and server
-public class Injection {
+public class Recommendation {
     private int appId;
     private int scriptId;
     private String packageName;
     private String scriptName;
 
-    public Injection() { }
+    public Recommendation() { }
 
-    public Injection(int appId, int scriptId) {
+    public Recommendation(int appId, int scriptId) {
         this.appId = appId;
         this.scriptId = scriptId;
     }
@@ -48,7 +48,7 @@ public class Injection {
 
     @Override
     public String toString() {
-        return "Injection{" +
+        return "Recommendation{" +
             "appId=" + appId +
             ", scriptId=" + scriptId +
             ", packageName='" + packageName + '\'' +
