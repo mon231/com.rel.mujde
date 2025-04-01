@@ -62,7 +62,7 @@ On devices with such framework (e.g. rooted devices with LSPosed over zygisk, or
 Simply install the app and enjoy hooking other apps, automatically & covertly! <br />
 
 If the app is installed over devices with no Xposed framework, it might simply crash when opened. <br />
-Use network guides to install LSposed / root your device.
+Use network guides to install LSposed / root your device, or use an emulator with similar guides.
 
 ## Code Classes
 
