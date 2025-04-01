@@ -30,9 +30,6 @@ public class DatabaseManager {
         return instance;
     }
 
-    /**
-     * Initialize the database by creating tables if they don't exist.
-     */
     private void initializeDatabase() {
         try (
             Connection conn = DriverManager.getConnection(DB_URL);

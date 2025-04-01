@@ -116,9 +116,6 @@ public class RecommendationResource {
         }
     }
 
-    /**
-     * Removes an association between a script and an application.
-     */
     @DELETE
     @Path("/{package_name}/{script_name}")
     public Response deleteRecommendation(

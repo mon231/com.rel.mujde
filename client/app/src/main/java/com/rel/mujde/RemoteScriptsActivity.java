@@ -181,7 +181,7 @@ public class RemoteScriptsActivity extends AppCompatActivity implements RemoteSc
             return;
         }
 
-        // NOTE there's a conflict between local and remote scripts, prompt user to choose
+        // NOTE if got to here, there's a conflict between local and remote scripts. let user choose
 
         long remoteLastModified = 0;
         long localLastModified = localScriptFile.lastModified();

@@ -65,7 +65,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         holder.appName.setText(app.loadLabel(packageManager));
         holder.packageName.setText(app.packageName);
 
-        // Set item click listener to launch script selection activity
+        // launch script selection activity
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

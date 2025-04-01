@@ -8,7 +8,7 @@ public class Script {
     private String scriptPath;
     private String networkPath;
     private LocalDateTime lastModified;
-    private String content;  // Transient field, not stored in database
+    private String content;  // NOTE transient field, not stored in database
 
     public Script() { }
 

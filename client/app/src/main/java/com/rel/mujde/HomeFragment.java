@@ -38,12 +38,10 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         pref = requireActivity().getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
 
-        // Initialize views
         repositoryInputLayout = view.findViewById(R.id.repository_input_layout);
         repositoryInput = view.findViewById(R.id.repository_input);
         saveRepositoryButton = view.findViewById(R.id.save_repository_button);
 
-        // Load saved repository URL or set default
         String savedRepository = pref.getString(Constants.PREF_SCRIPTS_REPOSITORY, Constants.DEFAULT_REPOSITORY);
         repositoryInput.setText(savedRepository);
 

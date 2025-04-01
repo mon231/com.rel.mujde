@@ -6,7 +6,7 @@ public class Script {
     private String scriptName;
     private String scriptPath;
     private String networkPath;
-    private String lastModified;  // ISO-8601 formatted date string
+    private String lastModified;  // NOTE ISO formatted date string
     private @Nullable String content;  // optional field
 
     public Script() { }

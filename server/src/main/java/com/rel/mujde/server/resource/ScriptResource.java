@@ -28,7 +28,6 @@ public class ScriptResource {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        // Enable pretty printing for debugging
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
@@ -45,7 +44,6 @@ public class ScriptResource {
     public Response getAllScripts() {
         try {
             List<Script> scripts = dbManager.getAllScripts();
-            // Convert to JSON string manually to avoid serialization issues
             String jsonScripts = objectMapper.writeValueAsString(scripts);
             return Response.ok(jsonScripts, MediaType.APPLICATION_JSON).build();
         } catch (Exception e) {
@@ -159,7 +157,7 @@ public class ScriptResource {
             if (updatedScript.getContent() != null && !updatedScript.getContent().isEmpty()) {
                 scriptFileHandler.writeScriptContent(existingScript.getScriptPath(), updatedScript.getContent());
             } else if (existingScript.getNetworkPath() != null) {
-                // If content not provided but network path exists, update from URL
+                // auto-download files if they do not exist but downloadable
                 scriptFileHandler.updateScriptFromUrl(existingScript);
             } else {
                 return Response.status(Response.Status.BAD_REQUEST)

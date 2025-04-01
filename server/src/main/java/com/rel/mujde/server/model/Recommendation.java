@@ -1,6 +1,5 @@
 package com.rel.mujde.server.model;
 
-// TODO: rename to 'recommendetion' in db and in the code and server
 public class Recommendation {
     private int appId;
     private int scriptId;
