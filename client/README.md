@@ -56,6 +56,14 @@ signapp -a mujde/client/app/build/outputs/apk/release/app-release.apk -o app-sig
 
 Find the apk (release build) at `app-signed.apk`
 
+## Install The App
+The app is implemented in form of Xposed module, therefore MUST be installed on devices with Xposed-framework, like LSposed/EdXposed. <br />
+On devices with such framework (e.g. rooted devices with LSPosed over zygisk, or virtual-LSposed over normal android/vm), <br />
+Simply install the app and enjoy hooking other apps, automatically & covertly! <br />
+
+If the app is installed over devices with no Xposed framework, it might simply crash when opened. <br />
+Use network guides to install LSposed / root your device.
+
 ## Code Classes
 
 ### Fragments
