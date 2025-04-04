@@ -21,6 +21,10 @@ jobs:
         working-directory: ./client
         run: bash ./gradlew assembleRelease
 
+      - name: Build AAB
+        working-directory: ./client
+        run: bash ./gradlew bundleRelease
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -39,3 +43,9 @@ jobs:
         with:
           name: mujde-apk
           path: app-release.apk
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: mujde-aab
+          path: client/app/build/outputs/bundle/release/app-release.aab
