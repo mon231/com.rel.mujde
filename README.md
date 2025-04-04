@@ -1,6 +1,6 @@
 # Mujde app
 Mujde is an android app in form of Xposed module, that integrates with Xposed framework to hook apps. <br />
-Mujde lets the user manage repository (local and remote) of frida-js scripts, and select what script should it inject to which selected application. <br />
+Mujde lets the user manage a local repository of frida-js scripts, and select what script should it inject to which selected application. <br />
 Using android's SharedPreferences, mujde stores a map between apps to the list of scripts it should inject into them. <br />
 Using Xposed's XSharedPreferences, mujde's hook (`InjectionRequester` cls) is accessible to that mapping.
 
@@ -43,15 +43,15 @@ git clone https://github.com/mon231/com.rel.mujde mujde
 
 Execute gradlew:
 ```bash
-cd mujde/client
+cd mujde
 ./gradlew assembleDebug
 ```
 
-Find the apk at `mujde/client/app/build/outputs/apk/debug/app-debug.apk`
+Find the apk at `mujde/app/build/outputs/apk/debug/app-debug.apk`
 In order to build the app for release compilations:
 ```bash
 ./gradlew assembleRelease
-signapp -a mujde/client/app/build/outputs/apk/release/app-release.apk -o app-signed.apk
+signapp -a mujde/app/build/outputs/apk/release/app-release.apk -o app-signed.apk
 ```
 
 Find the apk (release build) at `app-signed.apk`
@@ -67,8 +67,8 @@ Use network guides to install LSposed / root your device, or use an emulator wit
 ## Code Classes
 
 ### Fragments
+HomeFragment: shows home screen from navbar, the first fragment of the main activity
 ScriptsFragment: show the scripts page from navbar. let the user watch existing scripts, create new, edit, delete, ...
-HomeFragment: shows home screen from navbar, the first fragment of the main activity, let's user set remote-repository addr
 AppsFragment: show list of apps. when app is selected, creates the ScriptSelectionActivity for chosen app (via intent's extra)
 
 ### Services
@@ -87,18 +87,14 @@ InjectionRequestHandler: handles broadcasted com.rel.mujde.INJECT_REQUEST reques
 BootCompletedHandler: handles broadcasted ACTION_BOOT_COMPLETED msg, attempts to start the background service (* might fail in new android devices, as such service must be started from GUI activity)
 
 ### Utils
-api.ApiClient: util to get Retrofit client for ScriptServer
-api.ScriptServer: wrapper for HTTP restapi calls (for Retrofit client)
 ScriptUtils: utils about scripts (repository, SharedPref, content, files, folder, ...)
 AccessibilityUtils: chmod files / folders to make sure they are readable from other users
 
 ### Activities
 ActivityMain: the activity which contains the fragments and the footer navbar
 ScriptSelectionActivity: a screen where the user selects what scripts should be injected to currently selected app
-RemoteScriptsActivity: a screen where the user views, downloads and deletes scripts from the remote server
 
 ### Adapters
 AppListAdapter: used to list all installed apps and move to ScriptSelectionActivity to choose what scripts to inejct
 ScriptCheckboxAdapter: used by ScriptSelectionActivity, to track availableScripts/selectedScripts
 ScriptAdapter: used by ScriptsFragment to view each script-item (script name, edit button, delete button)
-RemoteScriptAdapter: views item per script (script id, name, delete button, date, ...)

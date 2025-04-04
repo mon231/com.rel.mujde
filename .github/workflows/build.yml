@@ -18,11 +18,9 @@ jobs:
           java-version: '21'
 
       - name: Build APK
-        working-directory: ./client
         run: bash ./gradlew assembleRelease
 
       - name: Build AAB
-        working-directory: ./client
         run: bash ./gradlew bundleRelease
 
       - name: Set up Python
@@ -36,7 +34,7 @@ jobs:
           pip install buildapp signapp --upgrade && buildapp_fetch_tools
 
       - name: Sign apk
-        run: signapp -a client/app/build/outputs/apk/release/app-release-unsigned.apk -o app-release.apk
+        run: signapp -a app/build/outputs/apk/release/app-release-unsigned.apk -o app-release.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -48,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mujde-aab
-          path: client/app/build/outputs/bundle/release/app-release.aab
+          path: app/build/outputs/bundle/release/app-release.aab
