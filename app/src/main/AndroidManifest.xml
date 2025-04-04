@@ -67,12 +67,6 @@
             android:theme="@style/Theme.MujdeTheme"
             android:parentActivityName=".ActivityMain" />
 
-        <activity
-            android:name=".RemoteScriptsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MujdeTheme"
-            android:parentActivityName=".ActivityMain" />
-
         <provider
             android:authorities="${applicationId}"
             android:name="androidx.core.content.FileProvider"

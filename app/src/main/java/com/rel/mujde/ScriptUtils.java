@@ -96,17 +96,6 @@ public class ScriptUtils {
         return scriptName + Constants.SCRIPT_FILE_EXT;
     }
 
-    @Nullable
-    public static String getRepositoryAddress(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
-        return prefs.getString(Constants.PREF_SCRIPTS_REPOSITORY, null);
-    }
-
-    public static boolean hasSetRepositoryAddress(Context context) {
-        String repository = getRepositoryAddress(context);
-        return repository != null && !repository.isEmpty();
-    }
-
     // NOTE XSharedPreferences inherits from SharedPreferences, this function is used for both
     public static List<String> getScriptsForPackage(String packageName, SharedPreferences prefs) {
         List<String> scripts = new ArrayList<>();
