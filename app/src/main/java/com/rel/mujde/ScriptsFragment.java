@@ -34,7 +34,6 @@ public class ScriptsFragment extends Fragment {
     private ListView listViewScripts;
     private TextView emptyTextView;
     private FloatingActionButton fabAddScript;
-    private FloatingActionButton fabCloud;
     private List<String> scriptsList = new ArrayList<>();
     private ArrayAdapter<String> scriptsAdapter;
 
@@ -48,7 +47,6 @@ public class ScriptsFragment extends Fragment {
         listViewScripts = view.findViewById(R.id.list_scripts);
         emptyTextView = view.findViewById(R.id.text_empty_scripts);
         fabAddScript = view.findViewById(R.id.fab_add_script);
-        fabCloud = view.findViewById(R.id.fab_cloud);
 
         // setup callbacks for app-item buttons
         scriptsAdapter = new ScriptAdapter(requireContext(), scriptsList, new ScriptAdapter.ScriptActionListener() {
@@ -72,16 +70,6 @@ public class ScriptsFragment extends Fragment {
 
     private void setupListeners(View view) {
         fabAddScript.setOnClickListener(e -> showAddScriptDialog());
-
-        fabCloud.setOnClickListener(v -> {
-            if (!ScriptUtils.hasSetRepositoryAddress(requireContext())) {
-                Toast.makeText(requireContext(), "Please configure repository URL in Home tab first", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            Intent intent = new Intent(requireContext(), RemoteScriptsActivity.class);
-            startActivity(intent);
-        });
     }
 
     @Override
