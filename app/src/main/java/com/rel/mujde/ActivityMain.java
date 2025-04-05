@@ -31,9 +31,6 @@ public class ActivityMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent startServiceIntent = new Intent(this, FridaInjectorService.class);
-        startService(startServiceIntent);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
