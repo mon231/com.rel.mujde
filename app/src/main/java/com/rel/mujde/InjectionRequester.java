@@ -18,6 +18,8 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class InjectionRequester implements IXposedHookLoadPackage {
+    private static boolean did_hook = false;
+
     private XSharedPreferences getPreferences() {
         XSharedPreferences pref = new XSharedPreferences(BuildConfig.APPLICATION_ID, Constants.SHARED_PREF_FILE_NAME);
         pref.reload();
@@ -67,15 +69,12 @@ public class InjectionRequester implements IXposedHookLoadPackage {
             new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
-                    final Activity activity = (Activity)param.thisObject;
-                    final int DELAY_ONE_SEC = 1000;
+                    if (did_hook) {
+                        return;
+                    }
 
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            sendInjectionRequest(activity);
-                        }
-                    }, DELAY_ONE_SEC);
+                    sendInjectionRequest((Activity)param.thisObject);
+                    did_hook = true;
                 }
             }
         );
