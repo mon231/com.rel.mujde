@@ -32,11 +32,6 @@
             android:name="xposedscope"
             android:resource="@array/module_scope" />
 
-        <service
-            android:name=".FridaInjectorService"
-            android:enabled="true"
-            android:exported="false" />
-
         <activity
             android:name=".ActivityMain"
             android:exported="true">

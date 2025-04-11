@@ -12,7 +12,6 @@
     <string name="error_saving_settings">Error saving settings</string>
     <string name="error_loading_apps">Error loading applications. Please try again.</string>
     <string name="app_icon">App icon</string>
-
     <string name="unsaved_changes_title">Unsaved Changes</string>
     <string name="unsaved_changes_message">You have unsaved changes. What would you like to do?</string>
     <string name="save_and_exit">Save and Exit</string>
@@ -22,16 +21,11 @@
         <item>com.linkedin.android</item>
         <item>com.instagram.android</item>
     </string-array>
-
-    <!-- Navigation -->
     <string name="title_home">Home</string>
     <string name="title_scripts">Repository</string>
     <string name="title_apps">Apps</string>
-
     <string name="select">Select</string>
     <string name="save">Save</string>
-
-    <!-- Script Selection -->
     <string name="script_count">%1$d scripts selected</string>
     <string name="no_scripts_selected">No scripts selected</string>
     <string name="select_scripts_for_app">Select Scripts for this App</string>
