@@ -46,12 +46,6 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".BootCompletedHandler" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
         <receiver android:name=".InjectionRequestHandler" android:exported="true">
             <intent-filter>
                 <action android:name="com.rel.mujde.INJECT_REQUEST" />
