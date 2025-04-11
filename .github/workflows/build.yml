@@ -1,4 +1,4 @@
-name: Build Mujde apk for LSPosed
+name: Build Mujde apk for Xפosed-framework
 
 on:
   push:
@@ -14,8 +14,8 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '21'
+          distribution: 'temurin'
 
       - name: Build APK
         run: bash ./gradlew assembleRelease
@@ -24,23 +24,23 @@ jobs:
         run: bash ./gradlew bundleRelease
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          cache: 'pip'
+          python-version: '3.12'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install buildapp signapp --upgrade && buildapp_fetch_tools
+      - name: Install signapp dependencies
+        run: pip install -r requirements.txt && buildapp_fetch_tools
 
       - name: Sign apk
-        run: signapp -a app/build/outputs/apk/release/app-release-unsigned.apk -o app-release.apk
+        working-directory: app/build/outputs/apk/release/
+        run: signapp -a app-release-unsigned.apk -o app-release.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: mujde-apk
-          path: app-release.apk
+          path: app/build/outputs/apk/release/app-release.apk
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
