@@ -8,9 +8,10 @@ Via Xposed framework, mujde gets a callback (`handleLoadPackage`) whenever an ap
 Then, mujde fetches the list of scripts it should inject to that app (using `XSharedPreferences`). <br />
 If that list isn't empty, mujde (`installHookOnActivityCreation`) installs hook on `Activity.onCreate` function, <br />
 Which lets us get a callback whenever a new activity is started in that app (which we already know that has scripts the user wants to inject into). <br />
-Then, from that hook, mujde sends an injection-request from the app's context to mujde's broadcast-listener named `InjectionRequestHandler`. <br />
-That handler sends the injection-request to mujde's injection service (`FridaInjectorService`) via intent, <br />
-And the service creates `frida-inject` subprocesses (as root user) to inject the selected scripts into the started app. <br />
+Then, from that hook, mujde sends an injection-request from the app's context to mujde's broadcast-listener named `InjectionRequestHandler`.
+
+That handler sends parses the injection-request via intent, <br />
+And creates `frida-inject` subprocesses (as root user) to inject the selected scripts into the started app. <br />
 NOTE that the scripts will be re-injected whenever the app creates/re-creates any activity.
 
 Mujde manages the local scripts repository in the app-data folder's `files` subfolder. <br />
@@ -47,7 +48,7 @@ cd mujde
 ./gradlew assembleDebug
 ```
 
-Find the apk at `mujde/app/build/outputs/apk/debug/app-debug.apk`
+Find the apk at `mujde/app/build/outputs/apk/debug/app-debug.apk` <br />
 In order to build the app for release compilations:
 ```bash
 ./gradlew assembleRelease
@@ -67,34 +68,29 @@ Use network guides to install LSposed / root your device, or use an emulator wit
 ## Code Classes
 
 ### Fragments
-HomeFragment: shows home screen from navbar, the first fragment of the main activity
-ScriptsFragment: show the scripts page from navbar. let the user watch existing scripts, create new, edit, delete, ...
-AppsFragment: show list of apps. when app is selected, creates the ScriptSelectionActivity for chosen app (via intent's extra)
-
-### Services
-FridaInjectorService: a background service that waits for notifications from InjectionRequestHandler then executes frida-inject process to inject requested scripts to the app
+* HomeFragment: shows home screen from navbar, the first fragment of the main activity
+* ScriptsFragment: show the scripts page from navbar. let the user watch existing scripts, create new, edit, delete, ...
+* AppsFragment: show list of apps. when app is selected, creates the ScriptSelectionActivity for chosen app (via intent's extra)
 
 ### Xposed-classes
-InjectionRequester: notified when a new injectible app is loaded, hooks it's Activity.onCreate method to broadcast a com.rel.mujde.INJECT_REQUEST request
+* InjectionRequester: notified when a new injectible app is loaded, <br /> hooks it's Activity.onCreate method to broadcast a com.rel.mujde.INJECT_REQUEST request
 
 ### DATA-classes
-InjectionRequest: simple data-holder to serialize/deserialize request content in Intent's extra
-Constants: contains consts and strings for global needs
-api.model.Script: struct to hold script info (name, id, ...)
+* InjectionRequest: simple data-holder to serialize/deserialize request content in Intent's extra
+* Constants: contains consts and strings for global needs
 
 ### Handlers
-InjectionRequestHandler: handles broadcasted com.rel.mujde.INJECT_REQUEST requests, notifies the FridaInjectorService
-BootCompletedHandler: handles broadcasted ACTION_BOOT_COMPLETED msg, attempts to start the background service (* might fail in new android devices, as such service must be started from GUI activity)
+* InjectionRequestHandler: handles broadcasted com.rel.mujde.INJECT_REQUEST requests, notifies the FridaInjectorService
 
 ### Utils
-ScriptUtils: utils about scripts (repository, SharedPref, content, files, folder, ...)
-AccessibilityUtils: chmod files / folders to make sure they are readable from other users
+* ScriptUtils: utils about scripts (repository, SharedPref, content, files, folder, ...)
+* AccessibilityUtils: chmod files / folders to make sure they are readable from other users
 
 ### Activities
-ActivityMain: the activity which contains the fragments and the footer navbar
-ScriptSelectionActivity: a screen where the user selects what scripts should be injected to currently selected app
+* ActivityMain: the activity which contains the fragments and the footer navbar
+* ScriptSelectionActivity: a screen where the user selects what scripts should be injected to currently selected app
 
 ### Adapters
-AppListAdapter: used to list all installed apps and move to ScriptSelectionActivity to choose what scripts to inejct
-ScriptCheckboxAdapter: used by ScriptSelectionActivity, to track availableScripts/selectedScripts
-ScriptAdapter: used by ScriptsFragment to view each script-item (script name, edit button, delete button)
+* AppListAdapter: used to list all installed apps and move to ScriptSelectionActivity to choose what scripts to inejct
+* ScriptCheckboxAdapter: used by ScriptSelectionActivity, to track availableScripts/selectedScripts
+* ScriptAdapter: used by ScriptsFragment to view each script-item (script name, edit button, delete button)
