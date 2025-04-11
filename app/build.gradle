@@ -1,5 +1,20 @@
+import com.google.gson.JsonParser
+
 plugins {
     id 'com.android.application'
+    id 'de.undercouch.download'
+}
+
+def getLatestFridaVersion = {
+    def connection = new URL("https://api.github.com/repos/frida/frida/releases/latest").openConnection()
+
+    connection.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
+    connection.setRequestProperty("Accept", "application/vnd.github+json")
+
+    def response = connection.inputStream.text
+    def jsonObject = JsonParser.parseString(response).getAsJsonObject()
+
+    return jsonObject.get("tag_name").getAsString()
 }
 
 android {
@@ -26,6 +41,7 @@ android {
     }
 
     namespace 'com.rel.mujde'
+
     buildFeatures {
         buildConfig true
     }
@@ -43,11 +59,6 @@ android {
         }
     }
 
-    ext {
-        // define frida version
-        fridaVersion = '16.7.0'
-    }
-
     configurations {
         downloader
         xzTools
@@ -58,12 +69,9 @@ android {
         xzTools 'org.tukaani:xz:1.9'
     }
 
-    // apply the web downloader plugin
-    apply plugin: 'de.undercouch.download'
-
     task downloadFrida {
         doLast {
-            // make xzTools library importable
+            // make xzTools importable
             URLClassLoader loader = new URLClassLoader(
                 configurations.xzTools.files.collect { it.toURI().toURL() } as URL[],
                 getClass().getClassLoader()
@@ -75,25 +83,21 @@ android {
             def armDir = new File(jniLibsDir, 'armeabi-v7a')
             def arm64Dir = new File(jniLibsDir, 'arm64-v8a')
 
-            arm64Dir.mkdirs()
-            armDir.mkdirs()
-            x86Dir.mkdirs()
-            x86_64Dir.mkdirs()
+            [x86Dir, x86_64Dir, armDir, arm64Dir].each { it.mkdirs() }
 
-            // binaries must have lib<name>.so format for android to extract them
             def injectorFileName = 'libfrida-inject.so'
+            def fridaVersion = getLatestFridaVersion()
 
             def architectures = [
-                'android-arm64': new File(arm64Dir, injectorFileName),
                 'android-arm': new File(armDir, injectorFileName),
+                'android-arm64': new File(arm64Dir, injectorFileName),
                 'android-x86': new File(x86Dir, injectorFileName),
                 'android-x86_64': new File(x86_64Dir, injectorFileName)
             ]
 
-            // download and extract frida-inject for each architecture
             architectures.each { arch, outputFile ->
                 if (outputFile.exists()) {
-                    println "frida for ${arch} already exists"
+                    println "frida for ${arch} already exists at ${outputFile.name}"
                     return
                 }
 
@@ -104,8 +108,6 @@ android {
                 def compressedInjector = new File(tempDir, injectorName)
                 def url = "https://github.com/frida/frida/releases/download/${fridaVersion}/${injectorName}"
 
-                println "Downloading frida for ${arch} from ${url}"
-
                 try {
                     download {
                         src url
@@ -114,18 +116,15 @@ android {
                     }
 
                     if (!compressedInjector.exists()) {
-                        println "Downloaded file does not exist at: ${compressedInjector.absolutePath}"
+                        println "Failed to download: ${compressedInjector.absolutePath}"
                         return
                     }
 
-                    println "Extracting Frida for ${arch}..."
-
-                    def extractedFilePath = compressedInjector.absolutePath.replace('.xz', '')
-                    def extractedFile = new File(extractedFilePath)
-
                     def XZInputStream = loader.loadClass('org.tukaani.xz.XZInputStream')
+                    def extractedFile = new File(compressedInjector.absolutePath.replace('.xz', ''))
+
                     compressedInjector.withInputStream { fis ->
-                        def xzIn = XZInputStream.getConstructor(java.io.InputStream.class).newInstance(fis)
+                        def xzIn = XZInputStream.getConstructor(InputStream.class).newInstance(fis)
                         xzIn.withStream { xzis ->
                             extractedFile.withOutputStream { fos ->
                                 fos << xzis
@@ -134,9 +133,10 @@ android {
                     }
 
                     extractedFile.renameTo(outputFile)
-                    println "Successfully extracted Frida for ${arch}"
+                    println "Successfully extracted frida for ${arch}"
+
                 } catch (Exception e) {
-                    println "Error processing Frida for ${arch}: ${e.message}"
+                    println "Error downloading or extracting ${arch}: ${e.message}"
                     e.printStackTrace()
                 }
             }
@@ -164,7 +164,6 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.google.code.gson:gson:2.8.9'
 
-    // Xposed hooks API
     compileOnly 'de.robv.android.xposed:api:82'
     compileOnly 'de.robv.android.xposed:api:82:sources'
 }
