@@ -209,11 +209,11 @@ public class ScriptsFragment extends Fragment {
 
     private void showDeleteScriptDialog(String scriptName) {
         new AlertDialog.Builder(requireContext())
-                .setTitle("Delete Script")
-                .setMessage("Are you sure you want to delete " + scriptName + "?")
-                .setPositiveButton("Delete", (dialog, which) -> deleteScript(scriptName))
-                .setNegativeButton("Cancel", null)
-                .show();
+        .setTitle("Delete Script")
+        .setMessage("Are you sure you want to delete " + scriptName + "?")
+        .setPositiveButton("Delete", (dialog, which) -> deleteScript(scriptName))
+        .setNegativeButton("Cancel", null)
+        .show();
     }
 
     private void deleteScript(String scriptName) {

@@ -37,10 +37,6 @@ public class ActivityMain extends AppCompatActivity {
         try {
             pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
         } catch (Exception e) {
-            pref = null;
-        }
-
-        if (pref == null) {
             suggestPartialInitialization();
             return;
         }
@@ -64,16 +60,6 @@ public class ActivityMain extends AppCompatActivity {
                 System.exit(EXIT_FAILURE);
             }
         })
-        .setNegativeButton(R.string.continue_anyway, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // continue with limited functionality, private shared-pref
-                pref = getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
-                initializeFragments();
-                setupNavigation();
-                setupBackPressHandling();
-            }
-        })
         .setCancelable(false)
         .show();
     }
@@ -91,16 +77,16 @@ public class ActivityMain extends AppCompatActivity {
                 // popup unsaved changes dialog if needed
                 if (appsFragment != null && appsFragment.hasUnsavedChanges()) {
                     new AlertDialog.Builder(ActivityMain.this)
-                        .setTitle(R.string.unsaved_changes_title)
-                        .setMessage(R.string.unsaved_changes_message)
-                        .setPositiveButton(R.string.cancel, null)
-                        .setNegativeButton(R.string.discard_and_exit, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        })
-                        .show();
+                    .setTitle(R.string.unsaved_changes_title)
+                    .setMessage(R.string.unsaved_changes_message)
+                    .setPositiveButton(R.string.cancel, null)
+                    .setNegativeButton(R.string.discard_and_exit, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .show();
                 } else {
                     finish();
                 }

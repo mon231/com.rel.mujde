@@ -23,7 +23,6 @@ public class InjectionRequester implements IXposedHookLoadPackage {
     private XSharedPreferences getPreferences() {
         XSharedPreferences pref = new XSharedPreferences(BuildConfig.APPLICATION_ID, Constants.SHARED_PREF_FILE_NAME);
         pref.reload();
-
         return pref;
     }
 

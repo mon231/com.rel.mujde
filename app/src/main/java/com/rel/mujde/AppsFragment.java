@@ -66,20 +66,16 @@ public class AppsFragment extends Fragment implements SearchView.OnQueryTextList
         try {
             pref = getActivity().getSharedPreferences(Constants.SHARED_PREF_FILE_NAME, MODE_WORLD_READABLE);
         } catch (Exception e) {
-            pref = null;
-        }
-
-        if (pref == null) {
             new AlertDialog.Builder(getActivity())
-                .setMessage(R.string.module_not_enabled)
-                .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getActivity().finish();
-                    }
-                })
-                .setCancelable(false)
-                .show();
+            .setMessage(R.string.module_not_enabled)
+            .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getActivity().finish();
+                }
+            })
+            .setCancelable(false)
+            .show();
         }
     }
 
