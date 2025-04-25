@@ -34,7 +34,7 @@ NOTE you can compile the app using windows / linux / macos
 - java-home (env. variable ANDROID_HOME) or local.properties set correctly with `sdk.dir`
 - internet connection (in order to download `frida-inject` binaries from frida's github releases)
 - python3 + pip + `pip install signapp buildapp && buildapp_fetch_tools`
-    * optional, only made for release builds
+    * optional, for release-builds only
 
 ### Build steps
 Clone the project:
